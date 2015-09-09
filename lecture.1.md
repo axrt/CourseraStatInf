@@ -1,0 +1,83 @@
+# Lecture 1
+Alexander Tuzhikov  
+September 8, 2015  
+
+
+#Introduction
+
+Statistical inference: generating conclusions about a population from a noisy sample. The only formal system we have.
+
+#Introduction to probablity
+
+##Probability
+Given a random experiment (say rolling a die) a probability measure is a population quantity that summarizes the randomness. Specifically, probability takes a possible outcome from the experiment and:
+- assign it a number between [0, 1]
+- so that hte probabitily of the union of any two sets of outcomes that have nothing in common (mutually exclusive) is the sum of their respective probabilities.
+
+**P(AUB)=P(A)+P(B)**
+
+Probability of nothing happening is 0, probability of smht happening form sure is 1.  
+Probability of smth is 1-probability of the opposite(s)  
+The probability of at least one of two (or more) things that can not simultaneously occur (mutually exclusive) is the sum of their respective probabilities.  
+If an event A implies the occurrence of event B, then the probability of A occurring is less that the probability of that B occurs.
+For any two events the probability that at leas one occurs is the sum of their probabilities minus their intersection.
+
+#Probability mass functions  
+##Random variable
+
+is a numerical outcome of an experiment. Can be discrete or continous.  
+
+##Probability mass function (PMF)
+
+A probability mass functnon eveluated at a value corresponds to the probability that a random variable takes that value. The be a valid pmf a function **p** must satisfy:
+
+- it must always be larger that or equal to 0.
+- the sum of the possible values that the random variable can take has to add up to one.
+
+#Probability density functions (PDF)
+
+To be a valid pdf, a function must satisfy:
+
+- it must ne larger than or equal to zero everywhere.
+- the total area uner it musth be one.
+
+##Quantiles
+
+If you are in the 95th percentile, then you know that 95% of the students did worse than you had done, and 5% had done better.
+
+**The alpha-th quantile of a distribution with distribution function F is the point xa so that F(xa)=alpha.**
+
+#Conditional probability
+
+Let *B* be an event such that *P(B)>0, *P(A|B)=P(A&cap;B)/P(B) *probability of A given that the event B has occurred is the probability of intersection devided by the probability of B*. I A and B are independent, then P(A|B)=P(A)P(B)/P(B)=P(A)
+
+#Baye's rule
+
+P(A|B)=P(A|B)P(B)/(P(A|B)P(B)+P(A|Bc)P(B<sup>c</sup>)P(B<sup>c</sup>))
+
+##Diagnostic test
+
+Let + and - be the event that the result of a diagnostic test is positive or negative respectively.
+Let D and D<sup>c</sup> be the event that the subject of the test has or does not have the disease respectively.
+
+**Sensitivity = P(+|D)**  
+**Specificity = P(-|D<sup>c</sup>)**  
+**Positive predictive value P(D|+)**  
+**Negative predictive value P(D<sup>c</sup>|-)**
+
+Prevalence of the disease P(D).
+
+##Likelihood ratios
+
+P(D|+)/P(D<sup>c</sup>|+)=P(+|D)/P(+|D<sup>c</sup>) * P(D)/P(D<sup>c</sup>)
+
+#Independence
+
+Event A is independent of event B if P(A|B)=P(A) where P(B)>0. P(A&cap;B) = P(A)P(B)
+
+#Expected Values
+
+Average of a random variable is also a random variable. 
+The center of this distribution is the same as that of the original distribution.
+
+
