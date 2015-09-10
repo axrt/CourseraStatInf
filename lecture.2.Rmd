@@ -1,0 +1,120 @@
+---
+title: "Lecture 2"
+author: "Alexander Tuzhikov"
+date: "September 10, 2015"
+output: 
+  html_document: 
+    fig_caption: yes
+    fig_height: 9
+    fig_width: 12
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+#The variance
+
+The variance of a random variable is a measure of spread. The square root of variance is standard deviation.
+
+The average of random sample from a population is itself a random variable. We call the standard deviation of a statistic a standard error.
+```{r quick prep}
+if(!require("ggplot2")){
+        install.packages("ggplot2")
+        library("ggplot2")
+}
+if(!require("UsingR")){
+        install.packages("UsingR")
+        library("UsingR")
+}
+```
+
+```{r simulation 1}
+#norm
+nosim<- 1000
+n<- 10
+sd(apply(matrix(rnorm(nosim*n),nosim),1,mean))
+sqrt(n)
+
+#unif
+sd(apply(matrix(runif(nosim*n),nosim),1,mean))
+1/sqrt(12*n)
+
+#pois
+sd(apply(matrix(rpois(nosim*n, 4),nosim),1,mean))
+2/sqrt(n)
+```
+
+```{r simulation 2}
+choose(8,7)*0.5^8 + choose(8,8) * 0.5^8
+pbinom(6, size=8, prob=0.5, lower.tail = FALSE)
+```
+
+```{r simulation 3}
+pnorm(1160, mean=1020, sd=50, lower.tail=FALSE)
+pnorm(2.8, lower.tail = FALSE)
+qnorm(0.75, mean=1020, sd=50)
+```
+
+```{r simulation 4}
+ppois(3, lambda=2.5*4)
+```
+```{r simulation 5}
+pbinom(2, size=500, prob=0.01)
+ppois(2, lambda = 500 * 0.01)
+```
+```{r simulation 6}
+n<- 1000
+cumsum(rnorm(n))/(1:n)
+cumsum(sample(0:1, n, replace=TRUE))/(1:n)
+```
+
+```{r confidence intervals}
+data("father.son")
+x<- father.son$sheight
+(mean(x)+c(-1,1)*qnorm(0.975)*sd(x)/sqrt(length(x)))/12
+round(1/sqrt(10^(1:6)),3)
+binom.test(56, 100)$conf.int
+
+n<- 20
+pvals<- seq(0.1, 0.9, by=0.05)
+nosim<- 1000
+coverage<- sapply(pvals, function(p){
+        phats<- rbinom(nosim, prob=p, size=n)/n
+        ll<- phats - qnorm(0.975) * sqrt(phats * (1-phats)/n)
+        ul<- phats + qnorm(0.975) * sqrt(phats *(1-phats)/n)
+        mean(ll<p&ul>p)
+})
+ggplot(data=data.frame(cbind(pvals=pvals, coverage=coverage)), mapping=aes(x=pvals, y=coverage)) + geom_line() + theme_bw() + geom_hline(yintercept=0.95, color="red")+ylim(0,1)
+
+n<- 100
+pvals<- seq(0.1, 0.9, by=0.05)
+nosim<- 1000
+coverage<- sapply(pvals, function(p){
+        phats<- rbinom(nosim, prob=p, size=n)/n
+        ll<- phats - qnorm(0.975) * sqrt(phats * (1-phats)/n)
+        ul<- phats + qnorm(0.975) * sqrt(phats *(1-phats)/n)
+        mean(ll<p&ul>p)
+})
+ggplot(data=data.frame(cbind(pvals=pvals, coverage=coverage)), mapping=aes(x=pvals, y=coverage)) + geom_line() + theme_bw() + geom_hline(yintercept=0.95, color="red")+ylim(0,1)
+
+n<- 20
+pvals<- seq(0.1, 0.9, by=0.05)
+nosim<- 1000
+coverage<- sapply(pvals, function(p){
+        phats<- (rbinom(nosim, prob=p, size=n)+2)/(n+4)
+        ll<- phats - qnorm(0.975) * sqrt(phats * (1-phats)/n)
+        ul<- phats + qnorm(0.975) * sqrt(phats *(1-phats)/n)
+        mean(ll<p&ul>p)
+})
+ggplot(data=data.frame(cbind(pvals=pvals, coverage=coverage)), mapping=aes(x=pvals, y=coverage)) + geom_line() + theme_bw() + geom_hline(yintercept=0.95, color="red")+ylim(0,1)
+```
+
+```{r nuclear pump}
+x<- 5
+t<- 94.32
+lambda<- x/t
+round(lambda+c(-1,1) * qnorm(0.975) * sqrt(lambda/t),3)
+poisson.test(x, T = 94.32)$conf
+```
+#Full notes
+<embed src="lecture.2.pdf" width="900" height="500" type='application/pdf'/>
