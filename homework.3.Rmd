@@ -1,0 +1,126 @@
+---
+title: "Homework 3"
+author: "Alexander Tuzhikov"
+date: "September 11, 2015"
+output: 
+  html_document: 
+    fig_caption: yes
+    fig_height: 9
+    fig_width: 12
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+#Homework
+
+##
+Load the data set mtcars in the datasets R package. Calculate a 95% confidence interval to the nearest MPG for the variable mpg.
+What is the lower endpoint of the interval?
+What is the upper endpoint of the interval?
+
+```{r 1}
+data("mtcars")
+head(mtcars)
+round(t.test(mtcars$mpg)$conf.int)
+```
+
+##
+Suppose that standard deviation of 9 paired differences is 1. What value would the average difference have to be so that the lower endpoint of a 95% students t confidence interval touches zero?
+Give the number here to two decimal places
+
+```{r 2}
+round(qt(.975, df = 8) * 1 / 3, 2)
+```
+
+##
+An independent group Student's T interval is used instead of a paired T interval when:  
+
+* The observations are paired between the groups.
+* The observations between the groups are naturally assumed to be statistically independent
+* As long as you do it correctly, either is fine.
+* More details are needed to answer this question
+
+```{r 3}
+2
+```
+
+##
+
+Consider the mtcars dataset. Construct a 95% T interval for MPG comparing 4 to 6 cylinder cars (subtracting in the order of 4 - 6) assume a constant variance.
+What is the lower endpoint of the interval to 1 decimal place?
+
+What is the upper endpoint of the interval to 1 decimal place?
+
+```{r 4}
+library(dplyr)
+mtcars %>% filter(cyl==4) -> four.cyl
+mtcars %>% filter(cyl==6) -> six.cyl
+round(t.test(four.cyl$mpg, six.cyl$mpg, paired = FALSE, var.equal = TRUE)$conf.int,1)
+```
+
+##
+
+If someone put a gun to your head and said "Your confidence interval must contain what it's estimating or I'll pull the trigger", what would be the smart thing to do?
+
+* Make your interval as wide as possible
+* Make your interval as small as possible
+* Call the authorities
+
+```{r 5}
+1
+```
+
+##
+
+Refer back to comparing MPG for 4 versus 6 cylinders. What do you conclude?
+
+* The interval is above zero, suggesting 6 is better than 4 in the terms of MPG
+* The interval is above zero, suggesting 4 is better than 6 in the terms of MPG
+* The interval does not tell you anything about the hypothesis test; you have to do the test.
+* The interval contains 0 suggesting no difference.
+
+```{r 6}
+2
+```
+
+##
+
+Suppose that 18 obese subjects were randomized, 9 each, to a new diet pill and a placebo. Subjects' body mass indices (BMIs) were measured at a baseline and again after having received the treatment or placebo for four weeks. The average difference from follow-up to the baseline (followup - baseline) was 3 kg/m2 for the treated group and 1 kg/m2 for the placebo group. The corresponding standard deviations of the differences was 1.5 kg/m2 for the treatment group and 1.8 kg/m2 for the placebo group. The study aims to answer whether the change in BMI over the four week period appear to differ between the treated and placebo groups.
+What is the pooled variance estimate? (to 2 decimal places)
+
+```{r 7}
+n1 <- n2 <- 9
+x1 <- -3  ##treated
+x2 <- 1  ##placebo
+s1 <- 1.5  ##treated
+s2 <- 1.8  ##placebo
+spsq <- ( (n1 - 1) * s1^2 + (n2 - 1) * s2^2) / (n1 + n2 - 2)
+spsq
+```
+
+##
+
+For Binomial data the maximum likelihood estimate for the probability of a success is
+
+* The proportion of successes
+* The proportion of failures
+* A shrunken version of the proportion of successes
+* A shrunken version of the proportion of failures
+
+```{r 8}
+1
+```
+
+##
+
+Bayesian inference requires
+
+* A type I error rate
+* Setting your confidence level
+* Assigning a prior probability distribution
+* Evaluating frequency error rates
+
+```{r 9}
+3
+```
