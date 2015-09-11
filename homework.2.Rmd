@@ -1,0 +1,30 @@
+---
+title: "Homework 2"
+author: "Alexander Tuzhikov"
+date: "September 10, 2015"
+output: 
+  html_document: 
+    fig_caption: yes
+    fig_height: 9
+    fig_width: 12
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+#2
+
+Suppose that the number of web hits to a particular site are approximately normally distributed with a mean of 100 hits per day and a standard deviation of 10 hits per day. What's the probability that a given day has fewer than 93 hits per day expressed as a percentage to the nearest percentage point?
+
+```{r 2}
+pnorm(93, mean=100, sd=10)
+```
+
+```{r 3}
+0.045/((0.045*0.95) - 0.95*0.88)
+```
+
+```{r 4}
+round(qnorm(p = 0.95, mean = 100, sd = 10, lower.tail = TRUE))
+```
+
