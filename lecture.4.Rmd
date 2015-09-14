@@ -1,0 +1,17 @@
+---
+title: "Lecture 4"
+author: "Alexander Tuzhikov"
+date: "September 14, 2015"
+output: 
+  html_document: 
+    fig_caption: yes
+    fig_height: 9
+    fig_width: 12
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+Almost all of it i simply wrote down, so pretty much nothing here except for the scan.
+
+<embed src="lecture.4.pdf" width="900" height="500" type='application/pdf'/>
