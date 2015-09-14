@@ -1,4 +1,4 @@
-\documentclass[]{article}
+\documentclass[9pt,]{article}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
@@ -15,6 +15,7 @@
   \fi
   \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
   \newcommand{\euro}{€}
+    \setmainfont{HelveticaNeue}
 \fi
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -161,6 +162,19 @@ different lambda:
        \CommentTok{#averages of 40 exponential(0.2)s" in the task}
 \NormalTok{sampling.count<-}\StringTok{ }\DecValTok{1000}  \CommentTok{#given by ".. you will need to do a }
        \CommentTok{#thousand or so simulated averages of 40 exponentials" in the task}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{2015}\NormalTok{) }\CommentTok{#seed for reproducibility}
+\NormalTok{ed.mean<-}\StringTok{ }\KeywordTok{mean}\NormalTok{(}\KeywordTok{rexp}\NormalTok{(}\FloatTok{1e6}\NormalTok{, }\FloatTok{0.2}\NormalTok{))}
+\NormalTok{ed.sd<-}\StringTok{ }\KeywordTok{sd}\NormalTok{(}\KeywordTok{rexp}\NormalTok{(}\FloatTok{1e6}\NormalTok{, }\FloatTok{0.2}\NormalTok{))}
+\KeywordTok{all.equal}\NormalTok{(ed.mean, ed.sd, }\DataTypeTok{tolerance =} \FloatTok{1e-2}\NormalTok{) }\CommentTok{#mean and standard deviation are equal up to 1e-2 level of prescision}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{#prepare a data.frame for the plot, melt by x, plot as line}
 \NormalTok{ed.plot.df<-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}
         \DataTypeTok{x=}\DecValTok{0}\NormalTok{:}\DecValTok{40}\NormalTok{,}
@@ -171,20 +185,69 @@ different lambda:
 \NormalTok{)) %>%}\StringTok{ }
 \StringTok{        }\KeywordTok{melt}\NormalTok{(}\DataTypeTok{id.vars=}\StringTok{"x"}\NormalTok{) %>%}
 \StringTok{        }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{., }\DataTypeTok{mapping=}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{x, }\DataTypeTok{group=}\NormalTok{variable, }\DataTypeTok{y=}\NormalTok{value, }\DataTypeTok{color=}\NormalTok{variable)) +}\StringTok{ }
-\StringTok{        }\KeywordTok{geom_line}\NormalTok{() +}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() +}\StringTok{ }\KeywordTok{xlim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{20}\NormalTok{) +}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{) +}
+\StringTok{        }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{size=}\DecValTok{2}\NormalTok{) +}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() +}\StringTok{ }\KeywordTok{xlim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{20}\NormalTok{) +}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{) +}
 \StringTok{        }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"ED Probability Density Function"}\NormalTok{) +}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Probability"}\NormalTok{) +}
-\StringTok{        }\KeywordTok{scale_color_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{rainbow}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DataTypeTok{start =} \FloatTok{0.4}\NormalTok{, }\DataTypeTok{end =} \FloatTok{0.8}\NormalTok{), }\DataTypeTok{labels=}\KeywordTok{c}\NormalTok{(}\StringTok{"0.2"}\NormalTok{,}\StringTok{"0.5"}\NormalTok{, }\StringTok{"1.0"}\NormalTok{, }\StringTok{"1.5"}\NormalTok{), }\DataTypeTok{name=}\StringTok{"Lambda"}\NormalTok{)}
+\StringTok{        }\KeywordTok{scale_color_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{rainbow}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DataTypeTok{start =} \FloatTok{0.3}\NormalTok{, }\DataTypeTok{end =} \FloatTok{0.9}\NormalTok{), }\DataTypeTok{labels=}\KeywordTok{c}\NormalTok{(}\StringTok{"0.2"}\NormalTok{,}\StringTok{"0.5"}\NormalTok{, }\StringTok{"1.0"}\NormalTok{, }\StringTok{"1.5"}\NormalTok{), }\DataTypeTok{name=}\StringTok{"Lambda"}\NormalTok{)}
 \KeywordTok{plot}\NormalTok{(ed.plot.df)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## Warning: Removed 81 rows containing missing values (geom_path).
-\end{verbatim}
-
 \includegraphics{course.project_files/figure-latex/Overview 1-1.pdf}
 
-\section{Simulations}\label{simulations}
+We just checked if the mean and the standard deviation are equal and
+plotted the probability density function at different levels of lambda.
+
+\section{Simulations: Sampling the
+ED}\label{simulations-sampling-the-ed}
+
+Now, let's move to the first task:\\
+\emph{1. Show the sample mean and compare it to the theoretical mean of
+the distribution.} First we gonna need 1000 samples of size 40 form ED.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#sampling}
+\NormalTok{samples<-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{do.call}\NormalTok{(}\DataTypeTok{what =} \StringTok{"cbind"}\NormalTok{, }\DataTypeTok{args =} \KeywordTok{lapply}\NormalTok{(}\DecValTok{1}\NormalTok{:sampling.count, function(x)\{}\KeywordTok{return}\NormalTok{(}\KeywordTok{rexp}\NormalTok{(n, lambdas[}\DecValTok{1}\NormalTok{]))\})))}
+\NormalTok{samples.colMeans<-}\StringTok{ }\KeywordTok{colMeans}\NormalTok{(samples) }\CommentTok{#calculate the column means}
+\end{Highlighting}
+\end{Shaded}
+
+Ok, now let's compare the theoretical mean, which is:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DecValTok{1}\NormalTok{/lambdas[}\DecValTok{1}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 5
+\end{verbatim}
+
+to that of the simulation procedure:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{mean}\NormalTok{(samples.colMeans) }\CommentTok{#calculate the total mean}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 5.016687
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#compare}
+\KeywordTok{all.equal}\NormalTok{(}\DecValTok{1}\NormalTok{/lambdas[}\DecValTok{1}\NormalTok{],}\KeywordTok{mean}\NormalTok{(samples.colMeans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Mean relative difference: 0.003337434"
+\end{verbatim}
+
+The difference is neglegible in our case.
 
 \section{Sample Mean versus Theoretical
 Mean}\label{sample-mean-versus-theoretical-mean}

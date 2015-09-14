@@ -3,7 +3,17 @@ title: 'Statistical Inference: The Study of the Exponential Distribution, A Simu
   Exercise'
 author: "Alexander Tuzhikov"
 date: "September 14, 2015"
+fontsize: 9pt
+documentclass: article
+mainfont: HelveticaNeue
 output:
+  pdf_document:
+    highlight: haddock
+    keep_tex: yes
+    latex_engine: xelatex
+    number_sections: yes
+    toc: yes
+    
   html_document:
     fig_caption: yes
     fig_height: 9
@@ -12,11 +22,6 @@ output:
     keep_md: yes
     number_sections: yes
     theme: cosmo
-    toc: yes
-  pdf_document:
-    highlight: haddock
-    keep_tex: yes
-    number_sections: yes
     toc: yes
 ---
 
@@ -30,16 +35,16 @@ library(reshape2)
 
 In accordance with [Wikipedia](https://en.wikipedia.org/wiki/Exponential_distribution), **e**xponential **d**istribution (ED) *is the probability distribution that describes the time between events in a Poisson process, i.e. a process in which events occur continuously and independently at a constant average rate.* Both *mean* and *standard deviation* of the ED is *1/lambda*. As suggested in the study objective, here we will use lambda = 0.2. However, for the purpose of introduction, let's reconstruct the wiki plots of the ED with different lambda:
 
-```{r Overview 1}
+```{r Overview 1, warning=FALSE}
 lambdas<- c(0.2, 0.5, 1, 1.5)#the given in the task + those from wikipedia
 n<- 40 #given by ".. you will investigate the distribution of 
        #averages of 40 exponential(0.2)s" in the task
 sampling.count<- 1000  #given by ".. you will need to do a 
        #thousand or so simulated averages of 40 exponentials" in the task
+set.seed(2015) #seed for reproducibility
 ed.mean<- mean(rexp(1e6, 0.2))
 ed.sd<- sd(rexp(1e6, 0.2))
-all.equal(ed.mean, ed.sd, tolerance = 1e-3) #mean and standard deviation are equal up to 1e-3 level of prescision
-ed.mean
+all.equal(ed.mean, ed.sd, tolerance = 1e-2) #mean and standard deviation are equal up to 1e-2 level of prescision
 #prepare a data.frame for the plot, melt by x, plot as line
 ed.plot.df<- as.data.frame(cbind(
         x=0:40,
@@ -56,9 +61,34 @@ ed.plot.df<- as.data.frame(cbind(
 plot(ed.plot.df)
 ```
 
-We just checked if the mean and the standard deviation are equal.
+We just checked if the mean and the standard deviation are equal and plotted the probability density function at different levels of lambda.
 
-#Simulations
+#Simulations: Sampling the ED
+
+Now, let's move to the first task:  
+*1. Show the sample mean and compare it to the theoretical mean of the distribution.* First we gonna need `r sampling.count` samples of size `r n` form ED.
+
+```{r simulation 1}
+#sampling
+samples<- as.data.frame(do.call(what = "cbind", args = lapply(1:sampling.count, function(x){return(rexp(n, lambdas[1]))})))
+samples.colMeans<- colMeans(samples) #calculate the column means
+```
+
+Ok, now let's compare the theoretical mean, which is:
+
+```{r simulation 2}
+1/lambdas[1]
+```
+
+to that of the simulation procedure:
+
+```{r simulation 3}
+mean(samples.colMeans) #calculate the total mean
+#compare
+all.equal(1/lambdas[1],mean(samples.colMeans))
+```
+
+The difference is neglegible in our case.
 
 #Sample Mean versus Theoretical Mean
 
