@@ -62,7 +62,7 @@ ed.plot.df<- as.data.frame(cbind(
 plot(ed.plot.df)
 ```
 
-It is obvious that ED is a skewed distribution, which drastically differes from the standard normal bell-shaped curve. We can always double check if the meand and standard deviation are indded equal in our example (see **[Code Block 1][]**, for the plot see **[Code Block 2][]**).
+It is obvious that ED is a skewed distribution, which drastically differs from the standard normal bell-shaped curve. We can always double check if the means and standard deviation are indeed equal in our example (see **[Code Block 1][]**, for the plot see **[Code Block 2][]**).
 ```{r Overview 2, warning=FALSE, results='hide', echo=FALSE}
 ed.mean<- mean(rexp(1e6, 0.2)) #generate values from ED
 ed.sd<- sd(rexp(1e6, 0.2))
@@ -82,7 +82,7 @@ samples.colMeans<- colMeans(samples) #calculate the column means
 
 #Sample Mean versus Theoretical Mean
 
-Ok, now let's compare the theoretical mean, which is **1/lambda**, to that of the simulation procedure:
+OK, now let's compare the theoretical mean, which is **1/lambda**, to that of the simulation procedure:
 
 ```{r simulation 2}
 ed.mean.theo<- 1/lambdas[1]
@@ -90,7 +90,7 @@ ed.mean.sim<- mean(samples.colMeans) #calculate the total mean
 print(c(theoretical.mean= ed.mean.theo, simulation.mean=ed.mean.sim))
 ```
 
-The difference is neglegible in our case.
+The difference is negligible in our case.
 
 #Sample Variance versus Theoretical Variance 
 
@@ -130,7 +130,7 @@ library(gridExtra)
 
 grid.arrange(combined.theo.sim.plot, qq.plot, ncol=2,widths=c(2, 1))
 ```
-The above two plots demonstrate that the simulated meand are very close to be distributed normally. Finally, let's see how *the distribution of a large collection of random exponentials and the distribution of a large collection of averages of 40 exponentials* differ (see **[Code Block 4][]**) 
+The above two plots demonstrate that the simulated means are very close to be distributed normally. Finally, let's see how *the distribution of a large collection of random exponentials and the distribution of a large collection of averages of 40 exponentials* differ (see **[Code Block 4][]**) 
 
 ```{r distribution 2, warning=FALSE, echo=FALSE, results='none', message=FALSE}
 ed.means.hist<- ggplot() + geom_histogram(data=ed.plot.data, mapping=aes(x=sampling.means, y=..density..), fill="lightsteelblue1", color="skyblue3", stat="bin", binwidth=0.25) +
