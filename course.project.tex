@@ -1,4 +1,4 @@
-\documentclass[9pt,]{article}
+\documentclass[]{article}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
@@ -15,7 +15,7 @@
   \fi
   \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
   \newcommand{\euro}{€}
-    \setmainfont{HelveticaNeue}
+    \setmainfont{Ubuntu}
 \fi
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -136,11 +136,6 @@ Simulation Exercise}
 \begin{document}
 \maketitle
 
-{
-\hypersetup{linkcolor=black}
-\setcounter{tocdepth}{2}
-\tableofcontents
-}
 \section{Overview: Exponential
 Distribution}\label{overview-exponential-distribution}
 
@@ -151,30 +146,117 @@ distribution that describes the time between events in a Poisson
 process, i.e.~a process in which events occur continuously and
 independently at a constant average rate.} Both \emph{mean} and
 \emph{standard deviation} of the ED is \emph{1/lambda}. As suggested in
-the study objective, here we will use lambda = 0.2. However, for the
-purpose of introduction, let's reconstruct the wiki plots of the ED with
-different lambda:
+the study objective, here we will use \textbf{lambda = 0.2}. However,
+for the purpose of introduction, let's reconstruct the wiki plots of the
+ED with different lambda:
+
+\begin{center}\includegraphics{course.project_files/figure-latex/Overview 3-1} \end{center}
+
+It is obvious that ED is a skewed distribution, which drastically
+differes from the standard normal bell-shaped curve. We can always
+double check if the meand and standard deviation are indded equal in our
+example (see \textbf{\hyperref[code-block-1]{Code Block 1}}, for the
+plot see \textbf{\hyperref[code-block-2]{Code Block 2}}).
+
+\section{Simulations: Sampling the
+ED}\label{simulations-sampling-the-ed}
+
+Now, let's move to the first task:\\
+\emph{1. Show the sample mean and compare it to the theoretical mean of
+the distribution.} First we gonna need 1000 samples of size 40 form ED.
+We will generate a matrix of 40 rows by 1000 columns, calculate the
+means and store them in a vector for further reuse (see
+\textbf{\hyperref[code-block-3]{Code Block 3}})
+
+\section{Sample Mean versus Theoretical
+Mean}\label{sample-mean-versus-theoretical-mean}
+
+Ok, now let's compare the theoretical mean, which is \textbf{1/lambda},
+to that of the simulation procedure:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{lambdas<-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\FloatTok{0.2}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{1.5}\NormalTok{)}\CommentTok{#the given in the task + those from wikipedia}
-\NormalTok{n<-}\StringTok{ }\DecValTok{40} \CommentTok{#given by ".. you will investigate the distribution of }
-       \CommentTok{#averages of 40 exponential(0.2)s" in the task}
-\NormalTok{sampling.count<-}\StringTok{ }\DecValTok{1000}  \CommentTok{#given by ".. you will need to do a }
-       \CommentTok{#thousand or so simulated averages of 40 exponentials" in the task}
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{2015}\NormalTok{) }\CommentTok{#seed for reproducibility}
-\NormalTok{ed.mean<-}\StringTok{ }\KeywordTok{mean}\NormalTok{(}\KeywordTok{rexp}\NormalTok{(}\FloatTok{1e6}\NormalTok{, }\FloatTok{0.2}\NormalTok{))}
-\NormalTok{ed.sd<-}\StringTok{ }\KeywordTok{sd}\NormalTok{(}\KeywordTok{rexp}\NormalTok{(}\FloatTok{1e6}\NormalTok{, }\FloatTok{0.2}\NormalTok{))}
-\KeywordTok{all.equal}\NormalTok{(ed.mean, ed.sd, }\DataTypeTok{tolerance =} \FloatTok{1e-2}\NormalTok{) }\CommentTok{#mean and standard deviation are equal up to 1e-2 level of prescision}
+\NormalTok{ed.mean.theo<-}\StringTok{ }\DecValTok{1}\NormalTok{/lambdas[}\DecValTok{1}\NormalTok{]}
+\NormalTok{ed.mean.sim<-}\StringTok{ }\KeywordTok{mean}\NormalTok{(samples.colMeans) }\CommentTok{#calculate the total mean}
+\KeywordTok{print}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DataTypeTok{theoretical.mean=} \NormalTok{ed.mean.theo, }\DataTypeTok{simulation.mean=}\NormalTok{ed.mean.sim))}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] TRUE
+## theoretical.mean  simulation.mean 
+##         5.000000         5.016687
 \end{verbatim}
+
+The difference is neglegible in our case.
+
+\section{Sample Variance versus Theoretical
+Variance}\label{sample-variance-versus-theoretical-variance}
+
+Now we will do the same in order to calculate the variance and see if it
+differs from the theoretical variance, as being asked in the second
+task: \emph{2. Show how variable it is and compare it to the theoretical
+variance of the distribution.}
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{ed.var.sim<-}\StringTok{ }\KeywordTok{var}\NormalTok{(}\KeywordTok{colMeans}\NormalTok{(samples))}\CommentTok{#simulated variance}
+\NormalTok{ed.var.theo<-}\StringTok{ }\NormalTok{(}\DecValTok{1}\NormalTok{/lambdas[}\DecValTok{1}\NormalTok{]/}\KeywordTok{sqrt}\NormalTok{(n))^}\DecValTok{2}\CommentTok{#the theoretical variance is}
+\KeywordTok{print}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DataTypeTok{thoretical.var=}\NormalTok{ed.var.theo, }\DataTypeTok{simulated.var=}\NormalTok{ed.var.sim))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## thoretical.var  simulated.var 
+##       0.625000       0.605856
+\end{verbatim}
+
+\section{Distribution: Sampling Means Are Distributed Approximately
+Normaly}\label{distribution-sampling-means-are-distributed-approximately-normaly}
+
+Now we move to the third task: \emph{3. Show that the distribution is
+approximately normal.}
+
+\includegraphics{course.project_files/figure-latex/distribution 1-1.pdf}
+The above two plots demonstrate that the simulated meand are very close
+to be distributed normally. Finally, let's see how \emph{the
+distribution of a large collection of random exponentials and the
+distribution of a large collection of averages of 40 exponentials}
+differ (see \textbf{\hyperref[code-block-4]{Code Block 4}})
+
+\includegraphics{course.project_files/figure-latex/distribution 2-1.pdf}
+The above plot shows how the sampling means becomes more and more
+``Normal distribution''-like shaped with the increase in the number of
+samples taken, while the density of ED becomes strongly non-normal (see
+\textbf{\hyperref[code-block-5]{Code Block 5}}).
+
+\section{Related R Code}\label{related-r-code}
+
+\subsection{Code Block 0}\label{code-block-0}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{### Code block 1: libraries}
+\KeywordTok{library}\NormalTok{(dplyr)}
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{library}\NormalTok{(reshape2)}
+\end{Highlighting}
+\end{Shaded}
+
+\hyperdef{}{code-block-1}{\subsection{Code Block 1}\label{code-block-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ed.mean<-}\StringTok{ }\KeywordTok{mean}\NormalTok{(}\KeywordTok{rexp}\NormalTok{(}\FloatTok{1e6}\NormalTok{, }\FloatTok{0.2}\NormalTok{)) }\CommentTok{#generate values from ED}
+\NormalTok{ed.sd<-}\StringTok{ }\KeywordTok{sd}\NormalTok{(}\KeywordTok{rexp}\NormalTok{(}\FloatTok{1e6}\NormalTok{, }\FloatTok{0.2}\NormalTok{))}
+\KeywordTok{all.equal}\NormalTok{(ed.mean, ed.sd, }\DataTypeTok{tolerance =} \FloatTok{1e-2}\NormalTok{) }\CommentTok{#equal up to 1e-2 level of prescision}
+\end{Highlighting}
+\end{Shaded}
+
+\hyperdef{}{code-block-2}{\subsection{Code Block 2}\label{code-block-2}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{### Code block 2: ED with different lambdas}
 \CommentTok{#prepare a data.frame for the plot, melt by x, plot as line}
 \NormalTok{ed.plot.df<-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}
         \DataTypeTok{x=}\DecValTok{0}\NormalTok{:}\DecValTok{40}\NormalTok{,}
@@ -185,76 +267,109 @@ different lambda:
 \NormalTok{)) %>%}\StringTok{ }
 \StringTok{        }\KeywordTok{melt}\NormalTok{(}\DataTypeTok{id.vars=}\StringTok{"x"}\NormalTok{) %>%}
 \StringTok{        }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{., }\DataTypeTok{mapping=}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{x, }\DataTypeTok{group=}\NormalTok{variable, }\DataTypeTok{y=}\NormalTok{value, }\DataTypeTok{color=}\NormalTok{variable)) +}\StringTok{ }
-\StringTok{        }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{size=}\DecValTok{2}\NormalTok{) +}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() +}\StringTok{ }\KeywordTok{xlim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{20}\NormalTok{) +}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{) +}
+\StringTok{        }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{size=}\DecValTok{1}\NormalTok{) +}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() +}\StringTok{ }\KeywordTok{xlim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{20}\NormalTok{) +}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{) +}
 \StringTok{        }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"ED Probability Density Function"}\NormalTok{) +}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Probability"}\NormalTok{) +}
-\StringTok{        }\KeywordTok{scale_color_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{rainbow}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DataTypeTok{start =} \FloatTok{0.3}\NormalTok{, }\DataTypeTok{end =} \FloatTok{0.9}\NormalTok{), }\DataTypeTok{labels=}\KeywordTok{c}\NormalTok{(}\StringTok{"0.2"}\NormalTok{,}\StringTok{"0.5"}\NormalTok{, }\StringTok{"1.0"}\NormalTok{, }\StringTok{"1.5"}\NormalTok{), }\DataTypeTok{name=}\StringTok{"Lambda"}\NormalTok{)}
+\StringTok{        }\KeywordTok{scale_color_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\StringTok{"violetred"}\NormalTok{, }\StringTok{"turquoise3"}\NormalTok{, }\StringTok{"springgreen4"}\NormalTok{, }
+                                    \StringTok{"salmon4"}\NormalTok{), }\DataTypeTok{labels=}\KeywordTok{c}\NormalTok{(}\StringTok{"0.2"}\NormalTok{,}\StringTok{"0.5"}\NormalTok{, }\StringTok{"1.0"}\NormalTok{, }\StringTok{"1.5"}\NormalTok{), }
+                           \DataTypeTok{name=}\StringTok{"Lambda"}\NormalTok{)+}
+\StringTok{        }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.key =} \KeywordTok{element_rect}\NormalTok{(}\DataTypeTok{colour =} \OtherTok{NA}\NormalTok{))}
 \KeywordTok{plot}\NormalTok{(ed.plot.df)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{course.project_files/figure-latex/Overview 1-1.pdf}
-
-We just checked if the mean and the standard deviation are equal and
-plotted the probability density function at different levels of lambda.
-
-\section{Simulations: Sampling the
-ED}\label{simulations-sampling-the-ed}
-
-Now, let's move to the first task:\\
-\emph{1. Show the sample mean and compare it to the theoretical mean of
-the distribution.} First we gonna need 1000 samples of size 40 form ED.
+\hyperdef{}{code-block-3}{\subsection{Code Block 3}\label{code-block-3}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{### Code block 3: sampling}
 \CommentTok{#sampling}
-\NormalTok{samples<-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{do.call}\NormalTok{(}\DataTypeTok{what =} \StringTok{"cbind"}\NormalTok{, }\DataTypeTok{args =} \KeywordTok{lapply}\NormalTok{(}\DecValTok{1}\NormalTok{:sampling.count, function(x)\{}\KeywordTok{return}\NormalTok{(}\KeywordTok{rexp}\NormalTok{(n, lambdas[}\DecValTok{1}\NormalTok{]))\})))}
+\NormalTok{samples<-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{do.call}\NormalTok{(}\DataTypeTok{what =} \StringTok{"cbind"}\NormalTok{, }
+                                \DataTypeTok{args =} \KeywordTok{lapply}\NormalTok{(}\DecValTok{1}\NormalTok{:sampling.count, }
+                                              \NormalTok{function(x)\{}\KeywordTok{return}\NormalTok{(}\KeywordTok{rexp}\NormalTok{(n, lambdas[}\DecValTok{1}\NormalTok{]))\})))}
 \NormalTok{samples.colMeans<-}\StringTok{ }\KeywordTok{colMeans}\NormalTok{(samples) }\CommentTok{#calculate the column means}
 \end{Highlighting}
 \end{Shaded}
 
-Ok, now let's compare the theoretical mean, which is:
+\hyperdef{}{code-block-4}{\subsection{Code Block 4}\label{code-block-4}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\DecValTok{1}\NormalTok{/lambdas[}\DecValTok{1}\NormalTok{]}
+\CommentTok{#generate normally distributed data and combine both menas and the generated data}
+\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{n=}\DecValTok{1}\NormalTok{:sampling.count, }\DataTypeTok{sampling.means=}\NormalTok{samples.colMeans, }
+                    \DataTypeTok{normal.data=}\KeywordTok{dnorm}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\FloatTok{0.01}\NormalTok{, }\DecValTok{10}\NormalTok{, }\FloatTok{0.01}\NormalTok{), }
+                                      \DataTypeTok{mean =} \NormalTok{ed.mean.theo, }
+                                      \DataTypeTok{sd =} \KeywordTok{sqrt}\NormalTok{(ed.var.theo)),}
+                    \DataTypeTok{normal.prob=}\KeywordTok{rnorm}\NormalTok{(}\DecValTok{1000}\NormalTok{, }
+                                      \DataTypeTok{mean =} \NormalTok{ed.mean.theo, }
+                                      \DataTypeTok{sd =} \KeywordTok{sqrt}\NormalTok{(ed.var.theo)))) ->}\StringTok{ }\NormalTok{ed.plot.data}
+\NormalTok{combined.theo.sim.plot<-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{() +}\StringTok{  }
+\StringTok{        }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{data=}\NormalTok{ed.plot.data, }
+                       \DataTypeTok{mapping=}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{samples.colMeans, }
+                                   \DataTypeTok{y=}\NormalTok{..density..,}
+                                   \DataTypeTok{fill=}\StringTok{"lightsteelblue1"}\NormalTok{),}
+                       \DataTypeTok{color=}\StringTok{"skyblue3"}\NormalTok{, }
+                       \DataTypeTok{stat=}\StringTok{"bin"}\NormalTok{,}\DataTypeTok{binwidth=}\FloatTok{0.25}\NormalTok{)+}
+\StringTok{        }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{data=}\NormalTok{ed.plot.data, }\DataTypeTok{mapping=}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\KeywordTok{seq}\NormalTok{(}\FloatTok{0.01}\NormalTok{, }\DecValTok{10}\NormalTok{, }\FloatTok{0.01}\NormalTok{),}
+                                                 \DataTypeTok{y=} \NormalTok{normal.data,}
+                                                 \DataTypeTok{color =} \StringTok{"chocolate"}\NormalTok{), }
+                  \DataTypeTok{size=}\FloatTok{1.5}\NormalTok{) +}\StringTok{ }
+\StringTok{        }\KeywordTok{geom_vline}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{xintercept=}\NormalTok{ed.mean.sim, }\DataTypeTok{color=}\StringTok{"green"}\NormalTok{)) +}
+\StringTok{        }\KeywordTok{geom_vline}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{xintercept=}\NormalTok{ed.mean.theo, }\DataTypeTok{color=}\StringTok{"red"}\NormalTok{)) +}
+\StringTok{        }\KeywordTok{xlim}\NormalTok{(}\FloatTok{2.5}\NormalTok{, }\FloatTok{7.5}\NormalTok{)+}\KeywordTok{theme_bw}\NormalTok{() +}\StringTok{ }
+\StringTok{        }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Sample Distribution vs Theoretical Distribution"}\NormalTok{) +}\StringTok{ }
+\StringTok{        }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Means"}\NormalTok{) +}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Density"}\NormalTok{) +}
+\StringTok{        }\KeywordTok{scale_fill_identity}\NormalTok{(}\DataTypeTok{name =} \StringTok{""}\NormalTok{, }\DataTypeTok{guide =} \StringTok{"legend"}\NormalTok{,}
+                            \DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\StringTok{"Simulated Means"}\NormalTok{)) +}
+\StringTok{        }\KeywordTok{scale_colour_manual}\NormalTok{(}\DataTypeTok{name =} \StringTok{""}\NormalTok{, }
+                            \DataTypeTok{values =} \KeywordTok{c}\NormalTok{(}\StringTok{"chocolate"}\NormalTok{=}\StringTok{"chocolate"}\NormalTok{,}
+                                       \StringTok{"red"}\NormalTok{=}\StringTok{"red"}\NormalTok{, }\StringTok{"green"}\NormalTok{=}\StringTok{"green"}\NormalTok{), }
+                            \DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\StringTok{"Theoretical Distribution"}\NormalTok{,}
+                                       \StringTok{"Theoretical Mean"}\NormalTok{, }\StringTok{"Simulated Mean"}\NormalTok{)) +}
+\StringTok{        }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.key =} \KeywordTok{element_rect}\NormalTok{(}\DataTypeTok{colour =} \OtherTok{NA}\NormalTok{), }\DataTypeTok{legend.position=}\StringTok{"bottom"}\NormalTok{,}\DataTypeTok{legend.box =} \StringTok{"horizontal"}\NormalTok{, }
+              \DataTypeTok{legend.text=}\KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=} \DecValTok{7}\NormalTok{))}
+\NormalTok{qq.plot<-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{() +}\StringTok{ }\KeywordTok{stat_qq}\NormalTok{(}\DataTypeTok{data=}\NormalTok{ed.plot.data, }
+                             \DataTypeTok{mapping=}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{sample=}\NormalTok{sampling.means,}\DataTypeTok{color=}\StringTok{"skyblue3"}\NormalTok{)) +}
+\StringTok{        }\KeywordTok{stat_qq}\NormalTok{(}\DataTypeTok{data=}\NormalTok{ed.plot.data, }
+                \DataTypeTok{mapping=}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{sample=}\NormalTok{normal.prob,}\DataTypeTok{color=}\StringTok{"chocolate"}\NormalTok{)) +}\StringTok{ }
+\StringTok{        }\KeywordTok{theme_bw}\NormalTok{() +}
+\StringTok{        }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Theoretical"}\NormalTok{) +}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Sample"}\NormalTok{) +}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Normal QQ-Plot"}\NormalTok{) +}\StringTok{ }
+\StringTok{        }\KeywordTok{scale_color_manual}\NormalTok{(}\DataTypeTok{name=}\StringTok{""}\NormalTok{, }
+                           \DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\StringTok{"skyblue3"}\NormalTok{=}\StringTok{"skyblue3"}\NormalTok{,}\StringTok{"chocolate"}\NormalTok{=}\StringTok{"chocolate"}\NormalTok{), }
+                           \DataTypeTok{labels=}\KeywordTok{c}\NormalTok{(}\StringTok{"Sampling Means"}\NormalTok{,}\StringTok{"Normal Data"}\NormalTok{))+}
+\StringTok{        }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.key =} \KeywordTok{element_rect}\NormalTok{(}\DataTypeTok{colour =} \OtherTok{NA}\NormalTok{), }\DataTypeTok{legend.position=}\StringTok{"bottom"}\NormalTok{,}
+              \DataTypeTok{legend.text=}\KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=} \DecValTok{7}\NormalTok{))}
+
+\KeywordTok{library}\NormalTok{(gridExtra)}
+
+\KeywordTok{grid.arrange}\NormalTok{(combined.theo.sim.plot, qq.plot, }\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{,}\DataTypeTok{widths=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## [1] 5
-\end{verbatim}
-
-to that of the simulation procedure:
+\hyperdef{}{code-block-5}{\subsection{Code Block 5}\label{code-block-5}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{mean}\NormalTok{(samples.colMeans) }\CommentTok{#calculate the total mean}
+\NormalTok{ed.means.hist<-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{() +}\StringTok{ }
+\StringTok{        }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{data=}\NormalTok{ed.plot.data, }
+                       \DataTypeTok{mapping=}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{sampling.means, }\DataTypeTok{y=}\NormalTok{..density..), }
+                       \DataTypeTok{fill=}\StringTok{"lightsteelblue1"}\NormalTok{, }
+                       \DataTypeTok{color=}\StringTok{"skyblue3"}\NormalTok{, }\DataTypeTok{stat=}\StringTok{"bin"}\NormalTok{, }\DataTypeTok{binwidth=}\FloatTok{0.25}\NormalTok{) +}
+\StringTok{        }\KeywordTok{theme_bw}\NormalTok{() +}\StringTok{ }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Sampling Means"}\NormalTok{) +}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Density"}\NormalTok{) +}\StringTok{ }
+\StringTok{        }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Sampling Means Density"}\NormalTok{) +}\StringTok{  }
+\StringTok{        }\KeywordTok{xlim}\NormalTok{(}\FloatTok{2.5}\NormalTok{, }\FloatTok{7.5}\NormalTok{)+}
+\StringTok{        }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.key =} \KeywordTok{element_rect}\NormalTok{(}\DataTypeTok{colour =} \OtherTok{NA}\NormalTok{))}
+\NormalTok{ed.values.hist<-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{() +}
+\StringTok{        }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{data=}\KeywordTok{melt}\NormalTok{(samples), }
+                       \DataTypeTok{mapping=}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{value, }\DataTypeTok{y=}\NormalTok{..density..), }
+                       \DataTypeTok{fill=}\StringTok{"palegreen"}\NormalTok{, }
+                       \DataTypeTok{color=}\StringTok{"darkgreen"}\NormalTok{, }
+                       \DataTypeTok{stat=}\StringTok{"bin"}\NormalTok{, }
+                       \DataTypeTok{binwidth=}\FloatTok{0.25}\NormalTok{) +}
+\StringTok{        }\KeywordTok{theme_bw}\NormalTok{() +}\StringTok{ }\KeywordTok{xlab}\NormalTok{(}\StringTok{"ED Simulations"}\NormalTok{) +}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Density"}\NormalTok{) +}\StringTok{ }
+\StringTok{        }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"ED Density"}\NormalTok{)+}\StringTok{  }\KeywordTok{xlim}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{20}\NormalTok{) +}
+\StringTok{        }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.key =} \KeywordTok{element_rect}\NormalTok{(}\DataTypeTok{colour =} \OtherTok{NA}\NormalTok{))}
+\KeywordTok{grid.arrange}\NormalTok{(ed.means.hist, ed.values.hist, }\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-## [1] 5.016687
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{#compare}
-\KeywordTok{all.equal}\NormalTok{(}\DecValTok{1}\NormalTok{/lambdas[}\DecValTok{1}\NormalTok{],}\KeywordTok{mean}\NormalTok{(samples.colMeans))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] "Mean relative difference: 0.003337434"
-\end{verbatim}
-
-The difference is neglegible in our case.
-
-\section{Sample Mean versus Theoretical
-Mean}\label{sample-mean-versus-theoretical-mean}
-
-\section{Sample Variance versus Theoretical
-Variance}\label{sample-variance-versus-theoretical-variance}
-
-\section{Distribution}\label{distribution}
 
 \end{document}

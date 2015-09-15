@@ -53,17 +53,131 @@ Now, let's move to the first task:
 
 
 ```r
+#sampling
 samples<- as.data.frame(do.call(what = "cbind", args = lapply(1:sampling.count, function(x){return(rexp(n, lambdas[1]))})))
-samples.colMeans<- colMeans(samples)
-mean(samples.colMeans)
-```
-
-```
-## [1] 5.016687
+samples.colMeans<- colMeans(samples) #calculate the column means
 ```
 
 #Sample Mean versus Theoretical Mean
 
-#Sample Variance versus Theoretical Variance
+Ok, now let's compare the theoretical mean, which is:
 
-#Distribution
+
+```r
+ed.mean.theo<- 1/lambdas[1]
+```
+
+to that of the simulation procedure:
+
+
+```r
+ed.mean.sim<- mean(samples.colMeans) #calculate the total mean
+print(c(theoretical.mean= ed.mean.theo, simulation.mean=ed.mean.sim))
+```
+
+```
+## theoretical.mean  simulation.mean 
+##         5.000000         5.016687
+```
+
+```r
+#compare
+all.equal(ed.mean.theo,ed.mean.sim)
+```
+
+```
+## [1] "Mean relative difference: 0.003337434"
+```
+
+The difference is neglegible in our case.
+
+#Sample Variance versus Theoretical Variance 
+
+Now we will do the same in order to calculate the variance and see if it differs from the theoretical variance, as being asked in the second task:
+*2. Show how variable it is and compare it to the theoretical variance of the distribution.*
+
+
+```r
+#simulated variance
+ed.var.sim<- var(colMeans(samples))
+#the theoretical variance is
+ed.var.theo<- (1/lambdas[1]/sqrt(n))^2
+print(c(thoretical.var=ed.var.theo, simulated.var=ed.var.sim))
+```
+
+```
+## thoretical.var  simulated.var 
+##       0.625000       0.605856
+```
+
+```r
+#compare
+all.equal(ed.var.theo,ed.var.sim)
+```
+
+```
+## [1] "Mean relative difference: 0.03063041"
+```
+#Distribution: Sampling Means Are Distributed Approximately Normaly
+
+Now we move to the third task: *3. Show that the distribution is approximately normal.* 
+
+
+```r
+#generate normally distributed data and combine both menas and the generated data in a data.frame
+as.data.frame(cbind(n=1:sampling.count, sampling.means=samples.colMeans, 
+                    normal.data=dnorm(seq(0.01, 10, 0.01), mean = ed.mean.theo, sd = sqrt(ed.var.theo)),
+                    normal.prob=rnorm(1000, mean = ed.mean.theo, sd = sqrt(ed.var.theo)))) -> ed.plot.data
+combined.theo.sim.plot<- ggplot() +  geom_histogram(data=ed.plot.data, mapping=aes(x=samples.colMeans, y=..density..,fill="lightsteelblue1"),color="skyblue3", stat="bin",binwidth=0.25)+
+        geom_line(data=ed.plot.data, mapping=aes(x=seq(0.01, 10, 0.01),y= normal.data,color = "chocolate"), size=1.5) + 
+        geom_vline(aes(xintercept=ed.mean.sim, color="green")) +
+        geom_vline(aes(xintercept=ed.mean.theo, color="red")) +
+        xlim(2.5, 7.5)+theme_bw() + labs(title="Sample Distribution vs Theoretical Distribution") + xlab("Means") + ylab("Density") +
+        scale_fill_identity(name = "", guide = "legend",labels = c("Simulated Means")) +
+        scale_colour_manual(name = "", values =c("chocolate"="chocolate","red"="red", "green"="green"), 
+                            labels = c("Theoretical Distribution","Theoretical Mean", "Simulated Mean")) +
+        theme(legend.position="bottom",legend.box = "horizontal")
+qq.plot<- ggplot() + stat_qq(data=ed.plot.data, mapping=aes(sample=sampling.means,color="skyblue3")) +
+        stat_qq(data=ed.plot.data, mapping=aes(sample=normal.prob,color="chocolate")) + theme_bw() +
+        xlab("Theoretical") + ylab("Sample") + labs(title="Normal QQ-Plot") + 
+        scale_color_manual(name="", values=c("skyblue3"="skyblue3","chocolate"="chocolate"), labels=c("Sampling Means","Normal Data"))+
+        theme(legend.position="bottom")
+
+library(gridExtra)
+```
+
+```
+## Loading required package: grid
+```
+
+```r
+grid.arrange(combined.theo.sim.plot, qq.plot, ncol=2,widths=c(2, 1))
+```
+
+```
+## Warning: Removed 499 rows containing missing values (geom_path).
+```
+
+![](course.project_files/figure-html/distribution 1-1.png) 
+The above two plots demonstrate that the simulated meand are very close to be distributed normally. Finally, let's see how *the distribution of a large collection of random exponentials and the distribution of a large collection of averages of 40 exponentials* differ. 
+
+
+```r
+ed.means.hist<- ggplot() + geom_histogram(data=ed.plot.data, mapping=aes(x=sampling.means, y=..density..), fill="lightsteelblue1", color="skyblue3", stat="bin", binwidth=0.25) +
+        theme_bw() + xlab("Sampling Means") + ylab("Density") + labs(title="Sampling Means Density") +  xlim(2.5, 7.5)
+ed.values.hist<- ggplot() +geom_histogram(data=melt(samples), mapping=aes(x=value, y=..density..), fill="palegreen", color="darkgreen", stat="bin", binwidth=0.25) +
+        theme_bw() + xlab("ED Simulations") + ylab("Density") + labs(title="ED Density")+  xlim(0, 20)
+```
+
+```
+## No id variables; using all as measure variables
+```
+
+```r
+grid.arrange(ed.means.hist, ed.values.hist, ncol=2)
+```
+
+![](course.project_files/figure-html/distribution 2-1.png) 
+The above plot shows how the sampling means becomes more and more "Normal distribution"-like shaped with the increase in the number of samples taken, while the density of ED becomes strongly non-normal.
+
+

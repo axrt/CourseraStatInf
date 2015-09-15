@@ -3,17 +3,15 @@ title: 'Statistical Inference: The Study of the Exponential Distribution, A Simu
   Exercise'
 author: "Alexander Tuzhikov"
 date: "September 14, 2015"
-fontsize: 9pt
-documentclass: article
-mainfont: HelveticaNeue
 output:
   pdf_document:
+    fig_height: 5.2
+    fig_width: 8
     highlight: haddock
     keep_tex: yes
     latex_engine: xelatex
     number_sections: yes
-    toc: yes
-    
+    toc_depth: 1
   html_document:
     fig_caption: yes
     fig_height: 9
@@ -21,8 +19,9 @@ output:
     highlight: haddock
     keep_md: yes
     number_sections: yes
-    theme: cosmo
     toc: yes
+documentclass: article
+mainfont: Ubuntu
 ---
 
 ```{r libraries, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
@@ -33,18 +32,18 @@ library(reshape2)
 
 #Overview: Exponential Distribution
 
-In accordance with [Wikipedia](https://en.wikipedia.org/wiki/Exponential_distribution), **e**xponential **d**istribution (ED) *is the probability distribution that describes the time between events in a Poisson process, i.e. a process in which events occur continuously and independently at a constant average rate.* Both *mean* and *standard deviation* of the ED is *1/lambda*. As suggested in the study objective, here we will use lambda = 0.2. However, for the purpose of introduction, let's reconstruct the wiki plots of the ED with different lambda:
+In accordance with [Wikipedia](https://en.wikipedia.org/wiki/Exponential_distribution), **e**xponential **d**istribution (ED) *is the probability distribution that describes the time between events in a Poisson process, i.e. a process in which events occur continuously and independently at a constant average rate.* Both *mean* and *standard deviation* of the ED is *1/lambda*. As suggested in the study objective, here we will use **lambda = 0.2**. However, for the purpose of introduction, let's reconstruct the wiki plots of the ED with different lambda:
 
-```{r Overview 1, warning=FALSE}
+```{r Overview 1, warning=FALSE, echo=FALSE, results='hide'}
 lambdas<- c(0.2, 0.5, 1, 1.5)#the given in the task + those from wikipedia
 n<- 40 #given by ".. you will investigate the distribution of 
        #averages of 40 exponential(0.2)s" in the task
 sampling.count<- 1000  #given by ".. you will need to do a 
        #thousand or so simulated averages of 40 exponentials" in the task
 set.seed(2015) #seed for reproducibility
-ed.mean<- mean(rexp(1e6, 0.2))
-ed.sd<- sd(rexp(1e6, 0.2))
-all.equal(ed.mean, ed.sd, tolerance = 1e-2) #mean and standard deviation are equal up to 1e-2 level of prescision
+```
+
+```{r Overview 3, warning=FALSE, echo=FALSE,fig.height=3, fig.width=7, fig.align='center'}
 #prepare a data.frame for the plot, melt by x, plot as line
 ed.plot.df<- as.data.frame(cbind(
         x=0:40,
@@ -55,43 +54,214 @@ ed.plot.df<- as.data.frame(cbind(
 )) %>% 
         melt(id.vars="x") %>%
         ggplot(data=., mapping=aes(x=x, group=variable, y=value, color=variable)) + 
-        geom_line(size=2) + theme_bw() + xlim(0,20) + ylim(0,1) +
+        geom_line(size=1) + theme_bw() + 
+        theme(legend.key = element_rect(colour = NA))+
+        xlim(0,20) + ylim(0,1) +
         labs(title="ED Probability Density Function") + ylab("Probability") +
-        scale_color_manual(values=rainbow(4, start = 0.3, end = 0.9), labels=c("0.2","0.5", "1.0", "1.5"), name="Lambda")
+        scale_color_manual(values=c("violetred", "turquoise3", "springgreen4", "salmon4"), labels=c("0.2","0.5", "1.0", "1.5"), name="Lambda")
 plot(ed.plot.df)
 ```
 
-We just checked if the mean and the standard deviation are equal and plotted the probability density function at different levels of lambda.
+It is obvious that ED is a skewed distribution, which drastically differes from the standard normal bell-shaped curve. We can always double check if the meand and standard deviation are indded equal in our example (see **[Code Block 1][]**, for the plot see **[Code Block 2][]**).
+```{r Overview 2, warning=FALSE, results='hide', echo=FALSE}
+ed.mean<- mean(rexp(1e6, 0.2)) #generate values from ED
+ed.sd<- sd(rexp(1e6, 0.2))
+all.equal(ed.mean, ed.sd, tolerance = 1e-2) #equal up to 1e-2 level of prescision
+```
 
 #Simulations: Sampling the ED
 
 Now, let's move to the first task:  
-*1. Show the sample mean and compare it to the theoretical mean of the distribution.* First we gonna need `r sampling.count` samples of size `r n` form ED.
+*1. Show the sample mean and compare it to the theoretical mean of the distribution.* First we gonna need `r sampling.count` samples of size `r n` form ED. We will generate a matrix of `r n` rows by `r sampling.count` columns, calculate the means and store them in a vector for further reuse (see **[Code Block 3][]**)
 
-```{r simulation 1}
+```{r simulation 1, echo=FALSE}
 #sampling
 samples<- as.data.frame(do.call(what = "cbind", args = lapply(1:sampling.count, function(x){return(rexp(n, lambdas[1]))})))
 samples.colMeans<- colMeans(samples) #calculate the column means
 ```
 
-Ok, now let's compare the theoretical mean, which is:
+#Sample Mean versus Theoretical Mean
+
+Ok, now let's compare the theoretical mean, which is **1/lambda**, to that of the simulation procedure:
 
 ```{r simulation 2}
-1/lambdas[1]
-```
-
-to that of the simulation procedure:
-
-```{r simulation 3}
-mean(samples.colMeans) #calculate the total mean
-#compare
-all.equal(1/lambdas[1],mean(samples.colMeans))
+ed.mean.theo<- 1/lambdas[1]
+ed.mean.sim<- mean(samples.colMeans) #calculate the total mean
+print(c(theoretical.mean= ed.mean.theo, simulation.mean=ed.mean.sim))
 ```
 
 The difference is neglegible in our case.
 
-#Sample Mean versus Theoretical Mean
+#Sample Variance versus Theoretical Variance 
 
-#Sample Variance versus Theoretical Variance
+Now we will do the same in order to calculate the variance and see if it differs from the theoretical variance, as being asked in the second task:
+*2. Show how variable it is and compare it to the theoretical variance of the distribution.*
 
-#Distribution
+```{r simulation 3}
+ed.var.sim<- var(colMeans(samples))#simulated variance
+ed.var.theo<- (1/lambdas[1]/sqrt(n))^2#the theoretical variance is
+print(c(thoretical.var=ed.var.theo, simulated.var=ed.var.sim))
+```
+#Distribution: Sampling Means Are Distributed Approximately Normaly
+
+Now we move to the third task: *3. Show that the distribution is approximately normal.* 
+
+```{r distribution 1, echo=FALSE,  warning=FALSE, message=FALSE, results='none'}
+#generate normally distributed data and combine both menas and the generated data in a data.frame
+as.data.frame(cbind(n=1:sampling.count, sampling.means=samples.colMeans, 
+                    normal.data=dnorm(seq(0.01, 10, 0.01), mean = ed.mean.theo, sd = sqrt(ed.var.theo)),
+                    normal.prob=rnorm(1000, mean = ed.mean.theo, sd = sqrt(ed.var.theo)))) -> ed.plot.data
+combined.theo.sim.plot<- ggplot() +  geom_histogram(data=ed.plot.data, mapping=aes(x=samples.colMeans, y=..density..,fill="lightsteelblue1"),color="skyblue3", stat="bin",binwidth=0.25)+
+        geom_line(data=ed.plot.data, mapping=aes(x=seq(0.01, 10, 0.01),y= normal.data,color = "chocolate"), size=1.5) + 
+        geom_vline(aes(xintercept=ed.mean.sim, color="green")) +
+        geom_vline(aes(xintercept=ed.mean.theo, color="red")) +
+        xlim(2.5, 7.5)+theme_bw() + labs(title="Sample Distribution vs Theoretical Distribution") + xlab("Means") + ylab("Density") +
+        scale_fill_identity(name = "", guide = "legend",labels = c("Simulated Means")) +
+        scale_colour_manual(name = "", values =c("chocolate"="chocolate","red"="red", "green"="green"), 
+                            labels = c("Theoretical Distribution","Theoretical Mean", "Simulated Mean")) +
+        theme(legend.key = element_rect(colour = NA),legend.position="bottom",legend.box = "horizontal", legend.text=element_text(size= 7))
+qq.plot<- ggplot() + stat_qq(data=ed.plot.data, mapping=aes(sample=sampling.means,color="skyblue3")) +
+        stat_qq(data=ed.plot.data, mapping=aes(sample=normal.prob,color="chocolate")) + theme_bw() +
+        xlab("Theoretical") + ylab("Sample") + labs(title="Normal QQ-Plot") + 
+        scale_color_manual(name="", values=c("skyblue3"="skyblue3","chocolate"="chocolate"), labels=c("Sampling Means","Normal Data"))+
+        theme(legend.key = element_rect(colour = NA),legend.position="bottom",legend.text=element_text(size= 7))
+
+library(gridExtra)
+
+grid.arrange(combined.theo.sim.plot, qq.plot, ncol=2,widths=c(2, 1))
+```
+The above two plots demonstrate that the simulated meand are very close to be distributed normally. Finally, let's see how *the distribution of a large collection of random exponentials and the distribution of a large collection of averages of 40 exponentials* differ (see **[Code Block 4][]**) 
+
+```{r distribution 2, warning=FALSE, echo=FALSE, results='none', message=FALSE}
+ed.means.hist<- ggplot() + geom_histogram(data=ed.plot.data, mapping=aes(x=sampling.means, y=..density..), fill="lightsteelblue1", color="skyblue3", stat="bin", binwidth=0.25) +
+        theme_bw() + xlab("Sampling Means") + ylab("Density") + labs(title="Sampling Means Density") +  xlim(2.5, 7.5) + theme(legend.key = element_rect(colour = NA))
+ed.values.hist<- ggplot() +geom_histogram(data=melt(samples), mapping=aes(x=value, y=..density..), fill="palegreen", color="darkgreen", stat="bin", binwidth=0.25) +
+        theme_bw() + xlab("ED Simulations") + ylab("Density") + labs(title="ED Density")+  xlim(0, 20) +theme(legend.key = element_rect(colour = NA))
+grid.arrange(ed.means.hist, ed.values.hist, ncol=2)
+```
+The above plot shows how the sampling means becomes more and more "Normal distribution"-like shaped with the increase in the number of samples taken, while the density of ED becomes strongly non-normal (see **[Code Block 5][]**).
+
+#Related R Code
+
+##Code Block 0
+```{r code 0, results="hide",fig.keep='none', warning=FALSE}
+### Code block 1: libraries
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+```
+
+##Code Block 1
+```{r code 1, results="hide",fig.keep='none', warning=FALSE}
+ed.mean<- mean(rexp(1e6, 0.2)) #generate values from ED
+ed.sd<- sd(rexp(1e6, 0.2))
+all.equal(ed.mean, ed.sd, tolerance = 1e-2) #equal up to 1e-2 level of prescision
+```
+
+##Code Block 2
+```{r code 2, results="hide",fig.keep='none', warning=FALSE}
+### Code block 2: ED with different lambdas
+#prepare a data.frame for the plot, melt by x, plot as line
+ed.plot.df<- as.data.frame(cbind(
+        x=0:40,
+        la.0.2=dexp(x=0:40, lambdas[1]),
+        la.0.5=dexp(x=0:40, lambdas[2]),
+        la.1=dexp(x=0:40, lambdas[3]),
+        la.1.5=dexp(x=0:40, lambdas[4])
+)) %>% 
+        melt(id.vars="x") %>%
+        ggplot(data=., mapping=aes(x=x, group=variable, y=value, color=variable)) + 
+        geom_line(size=1) + theme_bw() + xlim(0,20) + ylim(0,1) +
+        labs(title="ED Probability Density Function") + ylab("Probability") +
+        scale_color_manual(values=c("violetred", "turquoise3", "springgreen4", 
+                                    "salmon4"), labels=c("0.2","0.5", "1.0", "1.5"), 
+                           name="Lambda")+
+        theme(legend.key = element_rect(colour = NA))
+plot(ed.plot.df)
+```
+
+##Code Block 3
+```{r code 3, results="hide",fig.keep='none', warning=FALSE}
+### Code block 3: sampling
+#sampling
+samples<- as.data.frame(do.call(what = "cbind", 
+                                args = lapply(1:sampling.count, 
+                                              function(x){return(rexp(n, lambdas[1]))})))
+samples.colMeans<- colMeans(samples) #calculate the column means
+```
+
+##Code Block 4
+```{r code 4, results="hide",fig.keep='none', warning=FALSE, message=FALSE}
+#generate normally distributed data and combine both menas and the generated data
+as.data.frame(cbind(n=1:sampling.count, sampling.means=samples.colMeans, 
+                    normal.data=dnorm(seq(0.01, 10, 0.01), 
+                                      mean = ed.mean.theo, 
+                                      sd = sqrt(ed.var.theo)),
+                    normal.prob=rnorm(1000, 
+                                      mean = ed.mean.theo, 
+                                      sd = sqrt(ed.var.theo)))) -> ed.plot.data
+combined.theo.sim.plot<- ggplot() +  
+        geom_histogram(data=ed.plot.data, 
+                       mapping=aes(x=samples.colMeans, 
+                                   y=..density..,
+                                   fill="lightsteelblue1"),
+                       color="skyblue3", 
+                       stat="bin",binwidth=0.25)+
+        geom_line(data=ed.plot.data, mapping=aes(x=seq(0.01, 10, 0.01),
+                                                 y= normal.data,
+                                                 color = "chocolate"), 
+                  size=1.5) + 
+        geom_vline(aes(xintercept=ed.mean.sim, color="green")) +
+        geom_vline(aes(xintercept=ed.mean.theo, color="red")) +
+        xlim(2.5, 7.5)+theme_bw() + 
+        labs(title="Sample Distribution vs Theoretical Distribution") + 
+        xlab("Means") + ylab("Density") +
+        scale_fill_identity(name = "", guide = "legend",
+                            labels = c("Simulated Means")) +
+        scale_colour_manual(name = "", 
+                            values = c("chocolate"="chocolate",
+                                       "red"="red", "green"="green"), 
+                            labels = c("Theoretical Distribution",
+                                       "Theoretical Mean", "Simulated Mean")) +
+        theme(legend.key = element_rect(colour = NA), legend.position="bottom",legend.box = "horizontal", 
+              legend.text=element_text(size= 7))
+qq.plot<- ggplot() + stat_qq(data=ed.plot.data, 
+                             mapping=aes(sample=sampling.means,color="skyblue3")) +
+        stat_qq(data=ed.plot.data, 
+                mapping=aes(sample=normal.prob,color="chocolate")) + 
+        theme_bw() +
+        xlab("Theoretical") + ylab("Sample") + labs(title="Normal QQ-Plot") + 
+        scale_color_manual(name="", 
+                           values=c("skyblue3"="skyblue3","chocolate"="chocolate"), 
+                           labels=c("Sampling Means","Normal Data"))+
+        theme(legend.key = element_rect(colour = NA), legend.position="bottom",
+              legend.text=element_text(size= 7))
+
+library(gridExtra)
+
+grid.arrange(combined.theo.sim.plot, qq.plot, ncol=2,widths=c(2, 1))
+```
+
+##Code Block 5
+```{r code 5, results="hide",fig.keep='none', warning=FALSE, message=FALSE}
+ed.means.hist<- ggplot() + 
+        geom_histogram(data=ed.plot.data, 
+                       mapping=aes(x=sampling.means, y=..density..), 
+                       fill="lightsteelblue1", 
+                       color="skyblue3", stat="bin", binwidth=0.25) +
+        theme_bw() + xlab("Sampling Means") + ylab("Density") + 
+        labs(title="Sampling Means Density") +  
+        xlim(2.5, 7.5)+
+        theme(legend.key = element_rect(colour = NA))
+ed.values.hist<- ggplot() +
+        geom_histogram(data=melt(samples), 
+                       mapping=aes(x=value, y=..density..), 
+                       fill="palegreen", 
+                       color="darkgreen", 
+                       stat="bin", 
+                       binwidth=0.25) +
+        theme_bw() + xlab("ED Simulations") + ylab("Density") + 
+        labs(title="ED Density")+  xlim(0, 20) +
+        theme(legend.key = element_rect(colour = NA))
+grid.arrange(ed.means.hist, ed.values.hist, ncol=2)
+```
