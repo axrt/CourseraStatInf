@@ -1,0 +1,88 @@
+---
+title: "ToothGrowth Data Exploratory Analysis"
+author: "Alexander Tuzhikov"
+date: "September 14, 2015"
+output:
+  pdf_document:
+    fig_height: 5
+    fig_width: 8
+    highlight: haddock
+    keep_tex: yes
+    latex_engine: xelatex
+    number_sections: yes
+    toc_depth: 1
+  html_document:
+    fig_caption: yes
+    fig_height: 9
+    fig_width: 12
+    highlight: haddock
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+mainfont: Ubuntu
+documentclass: article
+---
+#Synopsis
+
+We are now moving to the part 2 of the task. Below we will exlore the `ToothGrowth` dataset from R `datasets` package. The headers below will correspond to the tasks. The data comes from the study [The Effect of Vitamin C on Tooth Growth in Guinea Pigs"][1]. The data is described as: *The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).*
+
+#Load the ToothGrowth data and perform some basic exploratory data analyses
+
+```{r libraries and data, message=FALSE, warning=FALSE}
+library(datasets)
+library(gridExtra)
+library(ggplot2)
+library(dplyr)
+data("ToothGrowth")
+```
+
+#Provide a basic summary of the data
+Well, the data is presented as a `data.frame` of `r nrow(ToothGrowth)` samples in `r ncol(ToothGrowth)` rows: `r colnames(ToothGrowth)`; 
+
+* **len** is the tooth length (microns)
+* **supp** is the supplement type (VC or OJ)
+* **dose** is the dose (milligrams)
+
+```{r summary 1.1, echo=FALSE}                         
+ToothGrowth %>% mutate(dose=factor(dose)) %>% summary()
+```
+```{r summary 1.2, echo=FALSE, fig.height=2, fig.width=5}
+ggplot(data=ToothGrowth, mapping=aes(x=factor(dose), y=len, color=supp)) + 
+        geom_point() + theme_bw()+
+        facet_wrap(~supp,ncol=2)+
+        scale_color_manual(name="Vitamin C Sources",
+                          labels=c("Orange Juice", "Ascorbic Acid"),
+                          values=c("orange1", "yellow")) +
+        theme(legend.key = element_rect(colour = NA), legend.position="bottom") +
+        labs(title="Tooth Growth Absolute Values") + xlab("") +
+        ylab("Tooth length, microns")
+```
+
+```{r summary 2, warning=FALSE, results='hide', echo=FALSE}
+str(ToothGrowth)
+ggplot(data=ToothGrowth, mapping=aes(x=factor(dose), y=len, fill=supp)) + 
+        geom_boxplot() + 
+        theme_bw()+
+        labs(title="Dose and Source Dependence of the Tooth Growth") +
+        theme(legend.key = element_rect(colour = NA), legend.position="bottom") +
+        xlab("Source Dose, milligrams") +ylab("Tooth length, microns") +
+        scale_fill_manual(name="Vitamin C Sources",
+                            labels=c("Orange Juice", "Ascorbic Acid"),
+                            values=c("orange1", "yellow"))
+```
+There obviously exists a positive and proportionate effect of orange juice as compared with the ascorbic acid, however, this effect can only be observed at dose levels below 2 mg. We can also demonstrate this in numeric values (see below, see **[Code Block 1][]**)
+```{r summary 3}
+ToothGrowth %>% filter(supp=="OJ") -> oj.data
+ToothGrowth %>% filter(supp=="VC") -> vc.data
+
+```
+#References
+
+[1]:http://jn.nutrition.org/content/33/5/491.full.pdf "C. I. Bliss (1952) The Statistics of Bioassay. Academic Press." 
+
+#Related R Code
+
+##Code Block 1
+```{r code 0, results="hide",fig.keep='none', warning=FALSE}
+
+```
