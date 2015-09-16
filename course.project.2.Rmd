@@ -24,38 +24,41 @@ documentclass: article
 ---
 #Synopsis
 
-We are now moving to the part 2 of the task. Below we will exlore the `ToothGrowth` dataset from R `datasets` package. The headers below will correspond to the tasks. The data comes from the study [The Effect of Vitamin C on Tooth Growth in Guinea Pigs"][1]. The data is described as: *The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).*
+We are now moving to the part 2 of the task. Below we will exlore the `ToothGrowth` dataset from R `datasets` package. The headers below will correspond to the tasks. The data comes from the study ["The Effect of Vitamin C on Tooth Growth in Guinea Pigs"][1]. The data is described as: *The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).*
 
 #Load the ToothGrowth data and perform some basic exploratory data analyses
 
-```{r libraries and data, message=FALSE, warning=FALSE}
+```{r libraries, message=FALSE, warning=FALSE, echo=FALSE}
 library(datasets)
 library(gridExtra)
 library(ggplot2)
 library(dplyr)
+library(pander)
+```
+
+```{r data, message=FALSE, warning=FALSE}
 data("ToothGrowth")
 ```
 
 #Provide a basic summary of the data
-Well, the data is presented as a `data.frame` of `r nrow(ToothGrowth)` samples in `r ncol(ToothGrowth)` rows: `r colnames(ToothGrowth)`; 
+Well, the data is presented as a `data.frame` of `r nrow(ToothGrowth)` samples in `r ncol(ToothGrowth)` rows: `r colnames(ToothGrowth)`;  The data is summarized in the Table 1 below (see **[Code Block 1][]**).
 
 * **len** is the tooth length (microns)
 * **supp** is the supplement type (VC or OJ)
 * **dose** is the dose (milligrams)
 
-```{r summary 1.1, echo=FALSE}                         
-ToothGrowth %>% mutate(dose=factor(dose)) %>% summary()
-```
-```{r summary 1.2, echo=FALSE, fig.height=2, fig.width=5}
-ggplot(data=ToothGrowth, mapping=aes(x=factor(dose), y=len, color=supp)) + 
-        geom_point() + theme_bw()+
-        facet_wrap(~supp,ncol=2)+
-        scale_color_manual(name="Vitamin C Sources",
-                          labels=c("Orange Juice", "Ascorbic Acid"),
-                          values=c("orange1", "yellow")) +
-        theme(legend.key = element_rect(colour = NA), legend.position="bottom") +
-        labs(title="Tooth Growth Absolute Values") + xlab("") +
-        ylab("Tooth length, microns")
+```{r summary 1, echo=FALSE, message=FALSE}                         
+ToothGrowth %>% mutate(dose=factor(dose)) %>% 
+        group_by(supp, dose) %>% 
+        summarize(
+                min.len=min(len), 
+                max.len=max(len),
+                mean.len=mean(len),
+                sd.len=sd(len),
+                q25=quantile(len,probs =0.25),
+                median.len=median(len),
+                q75=quantile(len,probs =0.75)) %>%
+        pander(caption = "Summary of the \"ToothGrowth\" Data")
 ```
 
 ```{r summary 2, warning=FALSE, results='hide', echo=FALSE}
@@ -70,19 +73,41 @@ ggplot(data=ToothGrowth, mapping=aes(x=factor(dose), y=len, fill=supp)) +
                             labels=c("Orange Juice", "Ascorbic Acid"),
                             values=c("orange1", "yellow"))
 ```
-There obviously exists a positive and proportionate effect of orange juice as compared with the ascorbic acid, however, this effect can only be observed at dose levels below 2 mg. We can also demonstrate this in numeric values (see below, see **[Code Block 1][]**)
-```{r summary 3}
-ToothGrowth %>% filter(supp=="OJ") -> oj.data
-ToothGrowth %>% filter(supp=="VC") -> vc.data
 
+There obviously exists a positive and proportionate effect of orange juice as compared with the ascorbic acid, however, this effect can only be observed at dose levels below 2 mg. We can also demonstrate this in numeric values (see below, see **[Code Block 2][]**)
+
+```{r summary 3, echo=FALSE}
+tooth.grows.list<- list()
+ToothGrowth %>% 
+        group_by(supp, dose) %>% 
+        do({
+                
+                tooth.grows.list[[length(tooth.grows.list)+1]]<<- as.data.frame(.)
+                names(tooth.grows.list)[length(tooth.grows.list)]<<-paste(.$supp[1],.$dose[1],sep="_")
+                return(.)
+        }) -> ToothGrowth
+pander(t.test(tooth.grows.list[["OJ_0.5"]]$len, tooth.grows.list[["VC_0.5"]]$len), caption = "Orange Juice vs Ascorbic Acid at 0.5 mg Dose")
+pander(t.test(tooth.grows.list[["OJ_1"]]$len, tooth.grows.list[["VC_1"]]$len), caption = "Orange Juice vs Ascorbic Acid at 1.0 mg Dose")
+pander(t.test(tooth.grows.list[["OJ_2"]]$len, tooth.grows.list[["VC_2"]]$len), caption = "Orange Juice vs Ascorbic Acid at 2.0 mg Dose")
 ```
+
 #References
 
 [1]:http://jn.nutrition.org/content/33/5/491.full.pdf "C. I. Bliss (1952) The Statistics of Bioassay. Academic Press." 
 
 #Related R Code
 
-##Code Block 1
+##Code Block 0
 ```{r code 0, results="hide",fig.keep='none', warning=FALSE}
+
+```
+
+##Code Block 1
+```{r code 1, results="hide",fig.keep='none', warning=FALSE}
+
+```
+
+##Code Block 2
+```{r code 2, results="hide",fig.keep='none', warning=FALSE}
 
 ```
