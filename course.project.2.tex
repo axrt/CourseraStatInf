@@ -138,8 +138,8 @@
 
 \section{Synopsis}\label{synopsis}
 
-We are now moving to the part 2 of the task. Below we will exlore the
-\texttt{ToothGrowth} dataset from R \texttt{datasets} package. The
+We are now moving to the part 2 of the task. Below we will explore the
+\texttt{ToothGrowth} data set from R \texttt{datasets} package. The
 headers below will correspond to the tasks. The data comes from the
 study \href{http://jn.nutrition.org/content/33/5/491.full.pdf}{``The
 Effect of Vitamin C on Tooth Growth in Guinea Pigs''}. The data is
@@ -550,14 +550,182 @@ two.sided
 \bottomrule
 \end{longtable}
 
+Tables 3-5 confirm the data in the Plot 1 with a \emph{t}-test (see
+\textbf{\hyperref[code-block-3]{Code Block 3}}. While the tests for 0.5-
+and 1.0-dose samples show significance with p-values \textbf{0.0063586}
+and \textbf{0.0010384} respectively, there seems to be no significant
+difference between the 2.0-dose level with p-value \textbf{0.9638516}.
+
+\section{Confidence intervals}\label{confidence-intervals}
+
+\begin{longtable}[c]{@{}cccc@{}}
+\toprule
+\begin{minipage}[b]{0.15\columnwidth}\centering\strut
+Test
+\strut\end{minipage} &
+\begin{minipage}[b]{0.21\columnwidth}\centering\strut
+CI lower bound
+\strut\end{minipage} &
+\begin{minipage}[b]{0.21\columnwidth}\centering\strut
+CI upper bound
+\strut\end{minipage} &
+\begin{minipage}[b]{0.11\columnwidth}\centering\strut
+p-value
+\strut\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.15\columnwidth}\centering\strut
+Dose 0.5 mg
+\strut\end{minipage} &
+\begin{minipage}[t]{0.21\columnwidth}\centering\strut
+1.719
+\strut\end{minipage} &
+\begin{minipage}[t]{0.21\columnwidth}\centering\strut
+8.781
+\strut\end{minipage} &
+\begin{minipage}[t]{0.11\columnwidth}\centering\strut
+0.006359
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.15\columnwidth}\centering\strut
+Dose 1.0 mg
+\strut\end{minipage} &
+\begin{minipage}[t]{0.21\columnwidth}\centering\strut
+2.802
+\strut\end{minipage} &
+\begin{minipage}[t]{0.21\columnwidth}\centering\strut
+9.058
+\strut\end{minipage} &
+\begin{minipage}[t]{0.11\columnwidth}\centering\strut
+0.001038
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.15\columnwidth}\centering\strut
+Dose 2.0 mg
+\strut\end{minipage} &
+\begin{minipage}[t]{0.21\columnwidth}\centering\strut
+-3.798
+\strut\end{minipage} &
+\begin{minipage}[t]{0.21\columnwidth}\centering\strut
+3.638
+\strut\end{minipage} &
+\begin{minipage}[t]{0.11\columnwidth}\centering\strut
+0.963852
+\strut\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Table 6 above provides upper and lower confidence interval bound for all
+three dose level comparisons (see \textbf{\hyperref[code-block-4]{Code
+Block 4}}).
+
+\section{Conclusions}\label{conclusions}
+
+Based on the data analysis discussed above, we can conclude that
+regardless of the source, tooth grows in guinea pigs is faster for those
+animals, that receive vitamin C supplemented ration. As for the sources
+of vitamin C, at lower doses (0.5-1 mg), orange juice favors tooth
+growth significantly more than ascorbic acid supplement. However, this
+effect is no longer significant at 2 mg dose.
+
 \section{References}\label{references}
+
+{[}1{]} C. I. Bliss (1952) The Statistics of Bioassay.Academic Press.
+\href{http://jn.nutrition.org/content/33/5/491.full.pdf}{``The Effect of
+Vitamin C on Tooth Growth in Guinea Pigs.''}
 
 \section{Related R Code}\label{related-r-code}
 
 \subsection{Code Block 0}\label{code-block-0}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(datasets)}
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{library}\NormalTok{(dplyr)}
+\KeywordTok{library}\NormalTok{(pander)}
+\KeywordTok{data}\NormalTok{(}\StringTok{"ToothGrowth"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
 \hyperdef{}{code-block-1}{\subsection{Code Block 1}\label{code-block-1}}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ToothGrowth %>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{dose=}\KeywordTok{factor}\NormalTok{(dose)) %>%}\StringTok{ }
+\StringTok{        }\KeywordTok{group_by}\NormalTok{(supp, dose) %>%}\StringTok{ }
+\StringTok{        }\KeywordTok{summarize}\NormalTok{(}
+                \DataTypeTok{min.len=}\KeywordTok{min}\NormalTok{(len), }
+                \DataTypeTok{max.len=}\KeywordTok{max}\NormalTok{(len),}
+                \DataTypeTok{mean.len=}\KeywordTok{mean}\NormalTok{(len),}
+                \DataTypeTok{sd.len=}\KeywordTok{sd}\NormalTok{(len),}
+                \DataTypeTok{q25=}\KeywordTok{quantile}\NormalTok{(len,}\DataTypeTok{probs =}\FloatTok{0.25}\NormalTok{),}
+                \DataTypeTok{median.len=}\KeywordTok{median}\NormalTok{(len),}
+                \DataTypeTok{q75=}\KeywordTok{quantile}\NormalTok{(len,}\DataTypeTok{probs =}\FloatTok{0.75}\NormalTok{)) %>%}
+\StringTok{        }\KeywordTok{pander}\NormalTok{(}\DataTypeTok{caption =} \StringTok{"Summary of the }\CharTok{\textbackslash{}"}\StringTok{ToothGrowth}\CharTok{\textbackslash{}"}\StringTok{ Data"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
 \hyperdef{}{code-block-2}{\subsection{Code Block 2}\label{code-block-2}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{str}\NormalTok{(ToothGrowth)}
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{ToothGrowth, }\DataTypeTok{mapping=}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\KeywordTok{factor}\NormalTok{(dose), }\DataTypeTok{y=}\NormalTok{len, }\DataTypeTok{fill=}\NormalTok{supp)) +}\StringTok{ }
+\StringTok{        }\KeywordTok{geom_boxplot}\NormalTok{() +}\StringTok{ }
+\StringTok{        }\KeywordTok{theme_bw}\NormalTok{()+}
+\StringTok{        }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Dose and Source Dependence of the Tooth Growth"}\NormalTok{) +}
+\StringTok{        }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.key =} \KeywordTok{element_rect}\NormalTok{(}\DataTypeTok{colour =} \OtherTok{NA}\NormalTok{), }\DataTypeTok{legend.position=}\StringTok{"bottom"}\NormalTok{) +}
+\StringTok{        }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Source Dose, milligrams"}\NormalTok{) +}\KeywordTok{ylab}\NormalTok{(}\StringTok{"Tooth length, microns"}\NormalTok{) +}
+\StringTok{        }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{name=}\StringTok{"Plot 1.   Vitamin C Sources"}\NormalTok{,}
+                            \DataTypeTok{labels=}\KeywordTok{c}\NormalTok{(}\StringTok{"Orange Juice"}\NormalTok{, }\StringTok{"Ascorbic Acid"}\NormalTok{),}
+                            \DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\StringTok{"orange1"}\NormalTok{, }\StringTok{"yellow"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hyperdef{}{code-block-3}{\subsection{Code Block 3}\label{code-block-3}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tooth.grows.list<-}\StringTok{ }\KeywordTok{list}\NormalTok{()}
+\NormalTok{ToothGrowth %>%}\StringTok{ }
+\StringTok{        }\KeywordTok{group_by}\NormalTok{(supp, dose) %>%}\StringTok{ }
+\StringTok{        }\KeywordTok{do}\NormalTok{(\{}
+                \NormalTok{tooth.grows.list[[}\KeywordTok{length}\NormalTok{(tooth.grows.list)+}\DecValTok{1}\NormalTok{]]<<-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(.)}
+                \KeywordTok{names}\NormalTok{(tooth.grows.list)[}\KeywordTok{length}\NormalTok{(tooth.grows.list)]<<-}\KeywordTok{paste}\NormalTok{(}
+                        \NormalTok{.$supp[}\DecValTok{1}\NormalTok{],.$dose[}\DecValTok{1}\NormalTok{],}\DataTypeTok{sep=}\StringTok{"_"}\NormalTok{)}
+                \KeywordTok{return}\NormalTok{(.)}
+        \NormalTok{\}) ->}\StringTok{ }\NormalTok{ToothGrowth}
+\CommentTok{#do t-tests}
+\NormalTok{dose}\FloatTok{.0.5}\NormalTok{.t.test<-}\StringTok{ }\KeywordTok{t.test}\NormalTok{(tooth.grows.list[[}\StringTok{"OJ_0.5"}\NormalTok{]]$len, tooth.grows.list[[}\StringTok{"VC_0.5"}\NormalTok{]]$len)}
+\NormalTok{dose}\FloatTok{.1.0}\NormalTok{.t.test<-}\StringTok{ }\KeywordTok{t.test}\NormalTok{(tooth.grows.list[[}\StringTok{"OJ_1"}\NormalTok{]]$len, tooth.grows.list[[}\StringTok{"VC_1"}\NormalTok{]]$len)}
+\NormalTok{dose}\FloatTok{.2.0}\NormalTok{.t.test<-}\StringTok{ }\KeywordTok{t.test}\NormalTok{(tooth.grows.list[[}\StringTok{"OJ_2"}\NormalTok{]]$len, tooth.grows.list[[}\StringTok{"VC_2"}\NormalTok{]]$len)}
+
+\KeywordTok{pander}\NormalTok{(dose}\FloatTok{.0.5}\NormalTok{.t.test, }\DataTypeTok{caption =} \StringTok{"Orange Juice vs Ascorbic Acid at 0.5 mg Dose"}\NormalTok{)}
+\KeywordTok{pander}\NormalTok{(dose}\FloatTok{.1.0}\NormalTok{.t.test, }\DataTypeTok{caption =} \StringTok{"Orange Juice vs Ascorbic Acid at 1.0 mg Dose"}\NormalTok{)}
+\KeywordTok{pander}\NormalTok{(dose}\FloatTok{.2.0}\NormalTok{.t.test, }\DataTypeTok{caption =} \StringTok{"Orange Juice vs Ascorbic Acid at 2.0 mg Dose"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hyperdef{}{code-block-4}{\subsection{Code Block 4}\label{code-block-4}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ci.data<-}\StringTok{ }\KeywordTok{rbind}\NormalTok{( }
+                \KeywordTok{c}\NormalTok{(}\StringTok{"Dose 0.5 mg"}\NormalTok{, }
+                  \KeywordTok{round}\NormalTok{(dose}\FloatTok{.0.5}\NormalTok{.t.test$conf.int[}\DecValTok{1}\NormalTok{],}\DecValTok{3}\NormalTok{), }
+                  \KeywordTok{round}\NormalTok{(dose}\FloatTok{.0.5}\NormalTok{.t.test$conf.int[}\DecValTok{2}\NormalTok{],}\DecValTok{3}\NormalTok{), }
+                  \KeywordTok{round}\NormalTok{(dose}\FloatTok{.0.5}\NormalTok{.t.test$p.value,}\DecValTok{6}\NormalTok{)),}
+                \KeywordTok{c}\NormalTok{(}\StringTok{"Dose 1.0 mg"}\NormalTok{, }
+                  \KeywordTok{round}\NormalTok{(dose}\FloatTok{.1.0}\NormalTok{.t.test$conf.int[}\DecValTok{1}\NormalTok{],}\DecValTok{3}\NormalTok{), }
+                  \KeywordTok{round}\NormalTok{(dose}\FloatTok{.1.0}\NormalTok{.t.test$conf.int[}\DecValTok{2}\NormalTok{],}\DecValTok{3}\NormalTok{), }
+                  \KeywordTok{round}\NormalTok{(dose}\FloatTok{.1.0}\NormalTok{.t.test$p.value,}\DecValTok{6}\NormalTok{)),}
+                \KeywordTok{c}\NormalTok{(}\StringTok{"Dose 2.0 mg"}\NormalTok{, }
+                  \KeywordTok{round}\NormalTok{(dose}\FloatTok{.2.0}\NormalTok{.t.test$conf.int[}\DecValTok{1}\NormalTok{],}\DecValTok{3}\NormalTok{), }
+                  \KeywordTok{round}\NormalTok{(dose}\FloatTok{.2.0}\NormalTok{.t.test$conf.int[}\DecValTok{2}\NormalTok{],}\DecValTok{3}\NormalTok{), }
+                  \KeywordTok{round}\NormalTok{(dose}\FloatTok{.2.0}\NormalTok{.t.test$p.value,}\DecValTok{6}\NormalTok{))}
+                \NormalTok{) %>%}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{()}
+\KeywordTok{colnames}\NormalTok{(ci.data)<-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Test"}\NormalTok{, }\StringTok{"CI lower bound"}\NormalTok{, }\StringTok{"CI upper bound"}\NormalTok{, }\StringTok{"p-value"}\NormalTok{)}
+\KeywordTok{pander}\NormalTok{(ci.data)}
+\end{Highlighting}
+\end{Shaded}
 
 \end{document}

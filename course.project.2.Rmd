@@ -4,7 +4,7 @@ author: "Alexander Tuzhikov"
 date: "September 14, 2015"
 output:
   pdf_document:
-    fig_height: 5
+    fig_height: 5.5
     fig_width: 8
     highlight: haddock
     keep_tex: yes
@@ -24,13 +24,12 @@ documentclass: article
 ---
 #Synopsis
 
-We are now moving to the part 2 of the task. Below we will exlore the `ToothGrowth` dataset from R `datasets` package. The headers below will correspond to the tasks. The data comes from the study ["The Effect of Vitamin C on Tooth Growth in Guinea Pigs"][1]. The data is described as: *The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).*
+We are now moving to the part 2 of the task. Below we will explore the `ToothGrowth` data set from R `datasets` package. The headers below will correspond to the tasks. The data comes from the study ["The Effect of Vitamin C on Tooth Growth in Guinea Pigs"][1]. The data is described as: *The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).*
 
 #Load the ToothGrowth data and perform some basic exploratory data analyses
 
 ```{r libraries, message=FALSE, warning=FALSE, echo=FALSE}
 library(datasets)
-library(gridExtra)
 library(ggplot2)
 library(dplyr)
 library(pander)
@@ -69,7 +68,7 @@ ggplot(data=ToothGrowth, mapping=aes(x=factor(dose), y=len, fill=supp)) +
         labs(title="Dose and Source Dependence of the Tooth Growth") +
         theme(legend.key = element_rect(colour = NA), legend.position="bottom") +
         xlab("Source Dose, milligrams") +ylab("Tooth length, microns") +
-        scale_fill_manual(name="Vitamin C Sources",
+        scale_fill_manual(name="Plot 1.   Vitamin C Sources",
                             labels=c("Orange Juice", "Ascorbic Acid"),
                             values=c("orange1", "yellow"))
 ```
@@ -81,17 +80,41 @@ tooth.grows.list<- list()
 ToothGrowth %>% 
         group_by(supp, dose) %>% 
         do({
-                
                 tooth.grows.list[[length(tooth.grows.list)+1]]<<- as.data.frame(.)
                 names(tooth.grows.list)[length(tooth.grows.list)]<<-paste(.$supp[1],.$dose[1],sep="_")
                 return(.)
         }) -> ToothGrowth
-pander(t.test(tooth.grows.list[["OJ_0.5"]]$len, tooth.grows.list[["VC_0.5"]]$len), caption = "Orange Juice vs Ascorbic Acid at 0.5 mg Dose")
-pander(t.test(tooth.grows.list[["OJ_1"]]$len, tooth.grows.list[["VC_1"]]$len), caption = "Orange Juice vs Ascorbic Acid at 1.0 mg Dose")
-pander(t.test(tooth.grows.list[["OJ_2"]]$len, tooth.grows.list[["VC_2"]]$len), caption = "Orange Juice vs Ascorbic Acid at 2.0 mg Dose")
+#do t-tests
+dose.0.5.t.test<- t.test(tooth.grows.list[["OJ_0.5"]]$len, tooth.grows.list[["VC_0.5"]]$len)
+dose.1.0.t.test<- t.test(tooth.grows.list[["OJ_1"]]$len, tooth.grows.list[["VC_1"]]$len)
+dose.2.0.t.test<- t.test(tooth.grows.list[["OJ_2"]]$len, tooth.grows.list[["VC_2"]]$len)
+
+pander(dose.0.5.t.test, caption = "Orange Juice vs Ascorbic Acid at 0.5 mg Dose")
+pander(dose.1.0.t.test, caption = "Orange Juice vs Ascorbic Acid at 1.0 mg Dose")
+pander(dose.2.0.t.test, caption = "Orange Juice vs Ascorbic Acid at 2.0 mg Dose")
 ```
 
+Tables 3-5 confirm the data in the Plot 1 with a *t*-test (see **[Code Block 3][]**. While the tests for 0.5- and 1.0-dose samples show significance with p-values **`r dose.0.5.t.test$p.value`** and **`r dose.1.0.t.test$p.value`** respectively, there seems to be no significant difference between the 2.0-dose level with p-value **`r dose.2.0.t.test$p.value`**.
+
+#Confidence intervals
+
+```{r confidence intervals, echo=FALSE}
+ci.data<- rbind( 
+                c("Dose 0.5 mg", round(dose.0.5.t.test$conf.int[1],3), round(dose.0.5.t.test$conf.int[2],3), round(dose.0.5.t.test$p.value,6)),
+                c("Dose 1.0 mg", round(dose.1.0.t.test$conf.int[1],3), round(dose.1.0.t.test$conf.int[2],3), round(dose.1.0.t.test$p.value,6)),
+                c("Dose 2.0 mg", round(dose.2.0.t.test$conf.int[1],3), round(dose.2.0.t.test$conf.int[2],3), round(dose.2.0.t.test$p.value,6))
+                ) %>% as.data.frame()
+colnames(ci.data)<- c("Test", "CI lower bound", "CI upper bound", "p-value")
+pander(ci.data)
+```
+Table 6 above provides upper and lower confidence interval bound for all three dose level comparisons (see **[Code Block 4][]**).
+
+#Conclusions
+
+Based on the data analysis discussed above, we can conclude that regardless of the source, tooth grows in guinea pigs is faster for those animals, that receive vitamin C supplemented ration. As for the sources of vitamin C, at lower doses (0.5-1 mg), orange juice favors tooth growth significantly more than ascorbic acid supplement. However, this effect is no longer significant at 2 mg dose. 
+
 #References
+\[1] C. I. Bliss (1952) The Statistics of Bioassay.Academic Press. ["The Effect of Vitamin C on Tooth Growth in Guinea Pigs."][1]
 
 [1]:http://jn.nutrition.org/content/33/5/491.full.pdf "C. I. Bliss (1952) The Statistics of Bioassay. Academic Press." 
 
@@ -99,15 +122,77 @@ pander(t.test(tooth.grows.list[["OJ_2"]]$len, tooth.grows.list[["VC_2"]]$len), c
 
 ##Code Block 0
 ```{r code 0, results="hide",fig.keep='none', warning=FALSE}
-
+library(datasets)
+library(ggplot2)
+library(dplyr)
+library(pander)
+data("ToothGrowth")
 ```
 
 ##Code Block 1
 ```{r code 1, results="hide",fig.keep='none', warning=FALSE}
-
+ToothGrowth %>% mutate(dose=factor(dose)) %>% 
+        group_by(supp, dose) %>% 
+        summarize(
+                min.len=min(len), 
+                max.len=max(len),
+                mean.len=mean(len),
+                sd.len=sd(len),
+                q25=quantile(len,probs =0.25),
+                median.len=median(len),
+                q75=quantile(len,probs =0.75)) %>%
+        pander(caption = "Summary of the \"ToothGrowth\" Data")
 ```
 
 ##Code Block 2
 ```{r code 2, results="hide",fig.keep='none', warning=FALSE}
+str(ToothGrowth)
+ggplot(data=ToothGrowth, mapping=aes(x=factor(dose), y=len, fill=supp)) + 
+        geom_boxplot() + 
+        theme_bw()+
+        labs(title="Dose and Source Dependence of the Tooth Growth") +
+        theme(legend.key = element_rect(colour = NA), legend.position="bottom") +
+        xlab("Source Dose, milligrams") +ylab("Tooth length, microns") +
+        scale_fill_manual(name="Plot 1.   Vitamin C Sources",
+                            labels=c("Orange Juice", "Ascorbic Acid"),
+                            values=c("orange1", "yellow"))
+```
+##Code Block 3
+```{r code 3, results="hide",fig.keep='none', warning=FALSE}
+tooth.grows.list<- list()
+ToothGrowth %>% 
+        group_by(supp, dose) %>% 
+        do({
+                tooth.grows.list[[length(tooth.grows.list)+1]]<<- as.data.frame(.)
+                names(tooth.grows.list)[length(tooth.grows.list)]<<-paste(
+                        .$supp[1],.$dose[1],sep="_")
+                return(.)
+        }) -> ToothGrowth
+#do t-tests
+dose.0.5.t.test<- t.test(tooth.grows.list[["OJ_0.5"]]$len, tooth.grows.list[["VC_0.5"]]$len)
+dose.1.0.t.test<- t.test(tooth.grows.list[["OJ_1"]]$len, tooth.grows.list[["VC_1"]]$len)
+dose.2.0.t.test<- t.test(tooth.grows.list[["OJ_2"]]$len, tooth.grows.list[["VC_2"]]$len)
 
+pander(dose.0.5.t.test, caption = "Orange Juice vs Ascorbic Acid at 0.5 mg Dose")
+pander(dose.1.0.t.test, caption = "Orange Juice vs Ascorbic Acid at 1.0 mg Dose")
+pander(dose.2.0.t.test, caption = "Orange Juice vs Ascorbic Acid at 2.0 mg Dose")
+```
+##Code Block 4
+```{r code 4, results="hide",fig.keep='none', warning=FALSE}
+ci.data<- rbind( 
+                c("Dose 0.5 mg", 
+                  round(dose.0.5.t.test$conf.int[1],3), 
+                  round(dose.0.5.t.test$conf.int[2],3), 
+                  round(dose.0.5.t.test$p.value,6)),
+                c("Dose 1.0 mg", 
+                  round(dose.1.0.t.test$conf.int[1],3), 
+                  round(dose.1.0.t.test$conf.int[2],3), 
+                  round(dose.1.0.t.test$p.value,6)),
+                c("Dose 2.0 mg", 
+                  round(dose.2.0.t.test$conf.int[1],3), 
+                  round(dose.2.0.t.test$conf.int[2],3), 
+                  round(dose.2.0.t.test$p.value,6))
+                ) %>% as.data.frame()
+colnames(ci.data)<- c("Test", "CI lower bound", "CI upper bound", "p-value")
+pander(ci.data)
 ```
